@@ -7,8 +7,6 @@ RSpec.describe Wikidotrb::Module::Page do
   let(:username) { RSpec.configuration.test_config['username'] }
   let(:password) { RSpec.configuration.test_config['password'] }
   let(:site_domain) { RSpec.configuration.test_config['site'] }
-
-  # Use a class instance variable to persist the test_page_name across all examples within the describe block
   let(:test_page_title) { "Test Page Title" }
   let(:test_page_source) { "This is a test page." }
   let(:client) { Wikidotrb::Module::Client.new(username: username, password: password) }
@@ -19,19 +17,28 @@ RSpec.describe Wikidotrb::Module::Page do
     @test_page_name = "test-page-#{Time.now.to_i}"
   end
 
-  before(:each) do
-    # テスト開始前にログイン確認
-    expect(client.is_logged_in).to be true
-    expect(client.username).to eq(username)
-    # テスト開始前にサイトオブジェクトを取得
-    expect(site).not_to be_nil
-
-    # Ensure the page does not exist before each test
-    existing_page = site.page.get(@test_page_name, raise_when_not_found: false)
-    existing_page.destroy if existing_page
-  end
-
   describe 'Page management' do
+    before(:each) do
+      # テスト開始前にログイン確認
+      expect(client.is_logged_in).to be true
+      expect(client.username).to eq(username)
+      # テスト開始前にサイトオブジェクトを取得
+      expect(site).not_to be_nil
+
+      # Ensure the page does not exist before each test
+      existing_page = site.page.get(@test_page_name, raise_when_not_found: false)
+      existing_page.destroy if existing_page
+    end
+
+    after(:each) do
+      # Ensure cleanup after each test
+      page = site.page.get(@test_page_name, raise_when_not_found: false)
+      page.destroy if page
+
+      # 各テストケース終了後にクライアントをログアウト
+      client.finalize if client.is_logged_in
+    end
+
     context 'Creating a page' do
       it '新しいページを作成できること' do
         page = site.page.create(
@@ -177,14 +184,5 @@ RSpec.describe Wikidotrb::Module::Page do
         end
       end
     end
-  end
-
-  after(:each) do
-    # Ensure cleanup after each test
-    page = site.page.get(@test_page_name, raise_when_not_found: false)
-    page.destroy if page
-
-    # 各テストケース終了後にクライアントをログアウト
-    client.finalize if client.is_logged_in
   end
 end
