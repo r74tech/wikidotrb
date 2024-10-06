@@ -22,7 +22,7 @@ module Wikidotrb
           { item: message_id, moduleName: 'dashboard/messages/DMViewMessageModule' }
         end
 
-        responses = client.amc_client.request(bodies, return_exceptions: true)
+        responses = client.amc_client.request(bodies: bodies, return_exceptions: true)
 
         messages = []
 
@@ -39,17 +39,16 @@ module Wikidotrb
             raise response
           end
 
-          html = Nokogiri::HTML(response.json['body'])
+          html = Nokogiri::HTML(response['body'])
           sender, recipient = html.css('div.pmessage div.header span.printuser')
-
           messages << PrivateMessage.new(
             client: client,
             id: message_ids[index],
-            sender: Wikidotrb::Util::Parser.user(client, sender),
-            recipient: Wikidotrb::Util::Parser.user(client, recipient),
+            sender: Wikidotrb::Util::Parser::UserParser.parse(client, sender),
+            recipient: Wikidotrb::Util::Parser::UserParser.parse(client, recipient),
             subject: html.css('div.pmessage div.header span.subject').text.strip,
             body: html.css('div.pmessage div.body').text.strip,
-            created_at: Wikidotrb::Util::Parser.odate(html.css('div.header span.odate'))
+            created_at: Wikidotrb::Util::Parser::ODateParser.parse(html.css('div.header span.odate'))
           )
         end
 
@@ -57,22 +56,22 @@ module Wikidotrb
       end
 
       def self._acquire(client:, module_name:)
-        response = client.amc_client.request([{ moduleName: module_name }])[0]
+        response = client.amc_client.request(bodies: [{ moduleName: module_name }])[0]
 
-        html = Nokogiri::HTML(response.json['body'])
+        html = Nokogiri::HTML(response['body'])
         pager = html.css('div.pager span.target')
         max_page = pager.length > 2 ? pager[-2].text.to_i : 1
 
         responses = if max_page > 1
                       bodies = (1..max_page).map { |page| { page: page, moduleName: module_name } }
-                      client.amc_client.request(bodies, return_exceptions: false)
+                      client.amc_client.request(bodies: bodies, return_exceptions: false)
                     else
                       [response]
                     end
 
         message_ids = []
         responses.each do |res|
-          html = Nokogiri::HTML(res.json['body'])
+          html = Nokogiri::HTML(res['body'])
           message_ids += html.css('tr.message').map { |tr| tr['data-href'].split('/').last.to_i }
         end
 
@@ -126,7 +125,7 @@ module Wikidotrb
 
       def self.send_message(client:, recipient:, subject:, body:)
         client.amc_client.request(
-          [{
+          bodies: [{
             source: body,
             subject: subject,
             to_user_id: recipient.id,

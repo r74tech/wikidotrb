@@ -26,7 +26,7 @@ module Wikidotrb
       def self.get_groups(site:, forum:)
         groups = []
 
-        response = site.amc_request([{ "moduleName" => "forum/ForumStartModule", "hidden" => "true" }]).first
+        response = site.amc_request(bodies: [{ "moduleName" => "forum/ForumStartModule", "hidden" => "true" }]).first
         body = JSON.parse(response.body)["body"]
         html = Nokogiri::HTML(body)
 

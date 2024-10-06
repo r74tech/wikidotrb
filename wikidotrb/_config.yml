@@ -1,4 +1,4 @@
 test:
   username: 'testuser'
   password: 'password'
-  site: 'test.wikidot.com'
+  site: 'test'

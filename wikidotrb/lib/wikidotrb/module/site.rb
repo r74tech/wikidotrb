@@ -31,7 +31,7 @@ module Wikidotrb
       # @param raise_when_not_found [Boolean] ページが見つからない場合に例外を発生させるかどうか
       # @return [Page, nil] ページオブジェクト、もしくはnil
       def get(fullname, raise_when_not_found: true)
-        res = PageCollection.search_pages(@site, SearchPagesQuery.new(fullname: fullname))
+        res = PageCollection.search_pages(@site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
 
         if res.empty?
           raise Wikidotrb::Common::Exceptions::NotFoundException.new("Page is not found: #{fullname}") if raise_when_not_found
@@ -62,7 +62,7 @@ module Wikidotrb
     end
 
     class Site
-      attr_reader :client, :id, :title, :unix_name, :domain, :ssl_supported
+      attr_reader :client, :id, :title, :unix_name, :domain, :ssl_supported, :pages, :page
 
       extend Wikidotrb::Common::Decorators
 
@@ -76,7 +76,7 @@ module Wikidotrb
 
         @pages = SitePagesMethods.new(self)
         @page = SitePageMethods.new(self)
-        @forum = Forum.new(self)
+        @forum = Forum.new(site: self)
       end
 
       def to_s
@@ -88,12 +88,15 @@ module Wikidotrb
       # @param unix_name [String] サイトのUNIX名
       # @return [Site] サイトオブジェクト
       def self.from_unix_name(client:, unix_name:)
-        # サイト情報を取得
-        response = HTTPX.get(
-          "http://#{unix_name}.wikidot.com",
-          follow_redirects: true,
-          timeout: client.amc_client.config.request_timeout
-        )
+        url = "http://#{unix_name}.wikidot.com"
+        timeout = { connect: client.amc_client.config.request_timeout }
+        response = HTTPX.with(timeout: timeout).get(url)
+
+        # リダイレクトの対応
+        while response.status >= 300 && response.status < 400
+          url = response.headers['location']
+          response = HTTPX.with(timeout: timeout).get(url)
+        end
 
         # サイトが存在しない場合
         if response.status == 404
@@ -149,14 +152,20 @@ module Wikidotrb
       # このサイトに対してAMCリクエストを実行する
       # @param bodies [Array<Hash>] リクエストボディのリスト
       # @param return_exceptions [Boolean] 例外を返すかどうか
-      def amc_request(bodies, return_exceptions: false)
-        client.amc_client.request(bodies, return_exceptions, unix_name, ssl_supported)
+      def amc_request(bodies:, return_exceptions: false)
+        client.amc_client.request(
+          bodies: bodies,
+          return_exceptions: return_exceptions,
+          site_name: unix_name,
+          site_ssl_supported: ssl_supported
+        )
       end
+
 
       # サイトへの未処理の参加申請を取得する
       # @return [Array<SiteApplication>] 未処理の申請リスト
       def get_applications
-        SiteApplication.acquire_all(self)
+        SiteApplication.acquire_all(site: self)
       end
 
       # ユーザーをサイトに招待する
@@ -165,7 +174,7 @@ module Wikidotrb
       def invite_user(user:, text:)
         begin
           amc_request(
-            [{
+            bodies: [{
               action: 'ManageSiteMembershipAction',
               event: 'inviteMember',
               user_id: user.id,
@@ -197,6 +206,7 @@ module Wikidotrb
 
       # `invite_user`にデコレータを適用
       login_required :invite_user
+      login_required :get_applications
     end
   end
 end

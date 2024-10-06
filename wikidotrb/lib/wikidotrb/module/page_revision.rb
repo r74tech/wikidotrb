@@ -30,7 +30,7 @@ module Wikidotrb
         return revisions if target_revisions.empty?
 
         responses = page.site.amc_request(
-          target_revisions.map do |revision|
+          bodies: target_revisions.map do |revision|
             { "moduleName" => "history/PageSourceModule", "revision_id" => revision.id }
           end
         )
@@ -57,7 +57,7 @@ module Wikidotrb
         return revisions if target_revisions.empty?
 
         responses = page.site.amc_request(
-          target_revisions.map do |revision|
+          bodies: target_revisions.map do |revision|
             { "moduleName" => "history/PageVersionModule", "revision_id" => revision.id }
           end
         )

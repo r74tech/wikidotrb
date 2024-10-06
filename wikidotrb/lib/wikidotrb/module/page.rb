@@ -96,10 +96,10 @@ module Wikidotrb
                       nil
                     elsif %w[created_at updated_at commented_at].include?(key)
                       odate_element = value_element.css('span.odate')
-                      odate_element.empty? ? nil : OdateParser.parse(odate_element)
+                      odate_element.empty? ? nil : Wikidotrb::Util::Parser::ODateParser.parse(odate_element)
                     elsif %w[created_by_linked updated_by_linked commented_by_linked].include?(key)
                       printuser_element = value_element.css('span.printuser')
-                      printuser_element.empty? ? nil : UserParser.parse(site.client, printuser_element)
+                      printuser_element.empty? ? nil : Wikidotrb::Util::Parser::UserParser.parse(site.client, printuser_element)
                     elsif %w[tags _tags].include?(key)
                       value_element.text.split
                     elsif %w[rating_votes comments size revisions].include?(key)
@@ -130,6 +130,221 @@ module Wikidotrb
 
         new(site: site, pages: pages)
       end
+
+      def self.search_pages(site, query = SearchPagesQuery.new)
+        # クエリの初期化
+        query_dict = query.to_h
+        query_dict['moduleName'] = 'list/ListPagesModule'
+        query_dict['module_body'] = %{
+          [[div class="page"]]
+          #{DEFAULT_MODULE_BODY.map { |key| %{
+            [[span class="set #{key}"]]
+              [[span class="name"]]#{key}[[/span]]
+              [[span class="value"]]%%#{key}%%[[/span]]
+            [[/span]]
+          } }.join("\n")}
+          [[/div]]
+        }
+
+        begin
+          # 初回リクエスト
+          response_data = site.amc_request(bodies: [query_dict])[0]
+        rescue Wikidotrb::Common::Exceptions::WikidotStatusCodeException => e
+          if e.status_code == 'not_ok'
+            raise Wikidotrb::Common::Exceptions::ForbiddenException, 'Failed to get pages, target site may be private'
+          end
+          raise e
+        end
+
+        body = response_data['body']
+        first_page_html_body = Nokogiri::HTML(body)
+
+        total = 1
+        html_bodies = [first_page_html_body]
+
+        # pagerの存在を確認
+        pager_element = first_page_html_body.css('div.pager')
+        if !pager_element.empty?
+          # 最大ページ数を取得
+          total = pager_element.css('span.target')[-2].css('a').text.to_i
+        end
+
+        # 複数ページが存在する場合はリクエストを繰り返す
+        if total > 1
+          request_bodies = []
+          (1...total).each do |i|
+            _query_dict = query_dict.dup
+            _query_dict['offset'] = i * query.perPage
+            request_bodies << _query_dict
+          end
+
+          responses = site.amc_request(bodies: request_bodies)
+          html_bodies.concat(responses.map { |response| Nokogiri::HTML(response['body']) })
+        end
+
+        # 全てのHTMLボディをパースしてページコレクションを作成
+        pages = html_bodies.flat_map { |html_body| parse(site, html_body) }
+        new(site: site, pages: pages)
+      end
+
+      # メソッドを定義する部分の修正
+      def get_page_sources
+        PageCollection.acquire_page_sources(@site, self)
+      end
+
+      def get_page_ids
+        PageCollection.acquire_page_ids(@site, self)
+      end
+
+      def get_page_revisions
+        PageCollection.acquire_page_revisions(@site, self)
+      end
+
+      def get_page_votes
+        PageCollection.acquire_page_votes(@site, self)
+      end
+
+      def get_page_discuss
+        PageCollection.acquire_page_discuss(@site, self)
+      end
+
+      def self.acquire_page_sources(site, pages)
+        return pages if pages.empty?
+
+        responses = site.amc_request(
+          bodies: pages.map { |page| { "moduleName" => "viewsource/ViewSourceModule", "page_id" => page.id } }
+        )
+
+        pages.each_with_index do |page, index|
+          body = responses[index]['body']
+          source = Nokogiri::HTML(body).at_css('div.page-source').text.strip
+          page.source = PageSource.new(page: page, wiki_text: source)
+        end
+
+        pages
+      end
+
+
+
+      def self.acquire_page_ids(site, pages)
+        target_pages = pages.reject(&:is_id_acquired?)
+        return pages if target_pages.empty?
+
+        responses = Wikidotrb::Util::RequestUtil.request(
+          client: site.client,
+          method: 'GET',
+          urls: target_pages.map { |page| "#{page.get_url}/norender/true/noredirect/true" }
+        )
+
+        responses.each_with_index do |response, index|
+          source = response.body.to_s  # Convert to string if necessary
+
+          id_match = source.match(/WIKIREQUEST\.info\.pageId = (\d+);/)
+          raise Wikidotrb::Common::Exceptions::UnexpectedException, "Cannot find page id: #{target_pages[index].fullname}" unless id_match
+
+          target_pages[index].id = id_match[1].to_i
+        end
+
+        pages
+      end
+
+
+      def self.acquire_page_revisions(site, pages)
+        return pages if pages.empty?
+
+        responses = site.amc_request(
+          bodies: pages.map { |page|
+            {
+              "moduleName" => "history/PageRevisionListModule",
+              "page_id" => page.id,
+              "options" => { "all" => true },
+              "perpage" => 100000000 # pagerを使わずに全て取得
+            }
+          }
+        )
+
+        responses.each_with_index do |response, index|
+          body = response['body']
+          revs = []
+          body_html = Nokogiri::HTML(body)
+
+          body_html.css('table.page-history > tr[id^=revision-row-]').each do |rev_element|
+            rev_id = rev_element['id'].gsub('revision-row-', '').to_i
+
+            tds = rev_element.css('td')
+            rev_no = tds[0].text.strip.gsub('.', '').to_i
+            created_by = Wikidotrb::Util::Parser::UserParser.parse(site.client, tds[4].css('span.printuser').first)
+            created_at = Wikidotrb::Util::Parser::ODateParser.parse(tds[5].css('span.odate').first)
+            comment = tds[6].text.strip
+
+            revs << PageRevision.new(
+              page: pages[index],
+              id: rev_id,
+              rev_no: rev_no,
+              created_by: created_by,
+              created_at: created_at,
+              comment: comment
+            )
+          end
+          pages[index].revisions = revs
+        end
+
+        pages
+      end
+
+      def self.acquire_page_votes(site, pages)
+        return pages if pages.empty?
+
+        responses = site.amc_request(
+          bodies: pages.map { |page| { "moduleName" => "pagerate/WhoRatedPageModule", "pageId" => page.id } }
+        )
+
+        responses.each_with_index do |response, index|
+          body = response['body']
+          html = Nokogiri::HTML(body)
+          user_elems = html.css('span.printuser')
+          value_elems = html.css('span[style^="color"]')
+
+          raise Wikidotrb::Common::Exceptions::UnexpectedException, 'User and value count mismatch' if user_elems.size != value_elems.size
+
+          users = user_elems.map { |user_elem| Wikidotrb::Util::Parser::UserParser.parse(site.client, user_elem) }
+          values = value_elems.map { |value_elem|
+            value = value_elem.text.strip
+            if value == '+'
+              1
+            elsif value == '-'
+              -1
+            else
+              value.to_i
+            end
+          }
+
+          votes = users.zip(values).map { |user, vote| PageVote.new(page: pages[index], user: user, value: vote) }
+          pages[index].votes = PageVoteCollection.new(page: pages[index], votes: votes)
+        end
+
+        pages
+      end
+
+      def self.acquire_page_discuss(site, pages)
+        target_pages = pages.reject(&:is_discuss_acquired?)
+        return pages if target_pages.empty?
+
+        responses = site.amc_request(
+          bodies: target_pages.map { |page|
+            {
+              "action" => "ForumAction",
+              "event" => "createPageDiscussionThread",
+              "page_id" => page.id,
+              "moduleName" => "Empty"
+            }
+          }
+        )
+
+        target_pages.each_with_index do |page, index|
+          page.discuss = ForumThread.new(site, responses[index]['thread_id'], page: page)
+        end
+      end
     end
 
     class Page
@@ -139,10 +354,10 @@ module Wikidotrb
                     :updated_by, :updated_at, :commented_by, :commented_at, :_id,
                     :_source, :_revisions, :_votes, :_discuss
 
-      def initialize(site:, fullname:, name:, category:, title:, children_count:, comments_count:, size:, rating:,
-                     votes_count:, rating_percent:, revisions_count:, parent_fullname:, tags:, created_by:, created_at:,
-                     updated_by:, updated_at:, commented_by: nil, commented_at:, _id: nil, _source: nil, _revisions: nil,
-                     _votes: nil, _discuss: nil)
+      def initialize(site:, fullname:, name: '', category: '', title: '', children_count: 0, comments_count: 0, size: 0, rating: 0,
+                    votes_count: 0, rating_percent: 0, revisions_count: 0, parent_fullname: '', tags: [], created_by: nil, created_at: nil,
+                    updated_by: nil, updated_at: nil, commented_by: nil, commented_at: nil, _id: nil, _source: nil, _revisions: nil,
+                    _votes: nil, _discuss: nil)
         @site = site
         @fullname = fullname
         @name = name
@@ -249,7 +464,7 @@ module Wikidotrb
 
       def destroy
         @site.client.login_check
-        @site.amc_request([
+        @site.amc_request(bodies: [
                             {
                               action: 'WikiPageAction',
                               event: 'deletePage',
@@ -260,8 +475,8 @@ module Wikidotrb
       end
 
       def get_metas
-        response = @site.amc_request([{ pageId: id, moduleName: 'edit/EditMetaModule' }])
-        body = response[0].json['body']
+        response_data = @site.amc_request(bodies: [{ pageId: id, moduleName: 'edit/EditMetaModule' }])[0]
+        body = response_data['body']
 
         metas = {}
         body.scan(/&lt;meta name="([^"]+)" content="([^"]+)"/) do |meta|
@@ -273,7 +488,7 @@ module Wikidotrb
 
       def set_meta(name, value)
         @site.client.login_check
-        @site.amc_request([
+        @site.amc_request(bodies: [
                             {
                               metaName: name,
                               metaContent: value,
@@ -287,7 +502,7 @@ module Wikidotrb
 
       def delete_meta(name)
         @site.client.login_check
-        @site.amc_request([
+        @site.amc_request(bodies: [
                             {
                               metaName: name,
                               action: 'WikiPageAction',
@@ -308,17 +523,17 @@ module Wikidotrb
         }
         page_lock_request_body[:force_lock] = 'yes' if force_edit
 
-        page_lock_response = site.amc_request([page_lock_request_body])[0]
-        page_lock_response_data = page_lock_response.json
+        # `site.amc_request` returns a Hash, no need to call `.json`
+        page_lock_response_data = site.amc_request(bodies: [page_lock_request_body])[0]
 
         if page_lock_response_data['locked'] || page_lock_response_data['other_locks']
-          raise TargetErrorException, "Page #{fullname} is locked or other locks exist"
+          raise Wikidotrb::Common::Exceptions::TargetErrorException, "Page #{fullname} is locked or other locks exist"
         end
 
         is_exist = page_lock_response_data.key?('page_revision_id')
 
         if raise_on_exists && is_exist
-          raise TargetExistsException, "Page #{fullname} already exists"
+          raise Wikidotrb::Common::Exceptions::TargetExistsException, "Page #{fullname} already exists"
         end
 
         raise ArgumentError, 'page_id must be specified when editing existing page' if is_exist && page_id.nil?
@@ -341,11 +556,11 @@ module Wikidotrb
           source: source,
           comments: comment
         }
-        response = site.amc_request([edit_request_body])[0]
+        response_data = site.amc_request(bodies: [edit_request_body])[0]
 
-        raise WikidotStatusCodeException, "Failed to create or edit page: #{fullname}" unless response.json['status'] == 'ok'
+        raise WikidotStatusCodeException, "Failed to create or edit page: #{fullname}" unless response_data['status'] == 'ok'
 
-        res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
+        res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
         raise NotFoundException, "Page creation failed: #{fullname}" if res.empty?
 
         res[0]
@@ -369,7 +584,7 @@ module Wikidotrb
 
       def set_tags(tags)
         @site.client.login_check
-        @site.amc_request([
+        @site.amc_request(bodies: [
                             {
                               tags: tags.join(' '),
                               action: 'WikiPageAction',

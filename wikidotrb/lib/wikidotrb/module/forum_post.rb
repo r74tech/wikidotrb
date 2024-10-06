@@ -51,7 +51,7 @@ module Wikidotrb
         return posts if posts.empty?
 
         responses = thread.site.amc_request(
-          posts.map do |post|
+          bodies: posts.map do |post|
             {
               "postId" => post.id,
               "threadId" => thread.id,
@@ -150,15 +150,15 @@ module Wikidotrb
         raise Wikidotrb::Common::UnexpectedException, "Post body can not be left empty." if source == ""
 
         response = @site.amc_request(
-          [
-            {
-              "parentId" => @id,
-              "title" => title,
-              "source" => source,
-              "action" => "ForumAction",
-              "event" => "savePost"
-            }
-          ]
+          bodies: [
+                    {
+                      "parentId" => @id,
+                      "title" => title,
+                      "source" => source,
+                      "action" => "ForumAction",
+                      "event" => "savePost"
+                    }
+                  ]
         ).first
         body = JSON.parse(response.body.to_s)
 
@@ -185,29 +185,29 @@ module Wikidotrb
 
         begin
           response = @site.amc_request(
-            [
-              {
-                "postId" => @id,
-                "threadId" => @thread.id,
-                "moduleName" => "forum/sub/ForumEditPostFormModule"
-              }
-            ]
+            bodies: [
+                      {
+                        "postId" => @id,
+                        "threadId" => @thread.id,
+                        "moduleName" => "forum/sub/ForumEditPostFormModule"
+                      }
+                    ]
           ).first
           html = Nokogiri::HTML(response.body.to_s)
           current_id = html.at_css("form#edit-post-form>input")[1].get("value").to_i
 
           @site.amc_request(
-            [
-              {
-                "postId" => @id,
-                "currentRevisionId" => current_id,
-                "title" => title || @title,
-                "source" => source || @source,
-                "action" => "ForumAction",
-                "event" => "saveEditPost",
-                "moduleName" => "Empty"
-              }
-            ]
+            bodies: [
+                      {
+                        "postId" => @id,
+                        "currentRevisionId" => current_id,
+                        "title" => title || @title,
+                        "source" => source || @source,
+                        "action" => "ForumAction",
+                        "event" => "saveEditPost",
+                        "moduleName" => "Empty"
+                      }
+                    ]
           )
         rescue Wikidotrb::Common::WikidotStatusCodeException
           return self
@@ -225,14 +225,14 @@ module Wikidotrb
       def destroy
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "postId" => @id,
-              "action" => "ForumAction",
-              "event" => "deletePost",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "postId" => @id,
+                      "action" => "ForumAction",
+                      "event" => "deletePost",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
       end
     end

@@ -12,9 +12,10 @@ module Wikidotrb
       # @param names [Array<String>] ユーザー名のリスト
       # @param raise_when_not_found [Boolean] ユーザーが見つからない場合に例外を送出するか
       # @return [UserCollection] ユーザーオブジェクトのリスト
-      def self.from_names(client:, names:, raise_when_not_found: false)
-        urls = names.map { |name| "https://www.wikidot.com/user:info/#{StringUtil.to_unix(name)}" }
-        responses = RequestUtil.request(client: client, method: 'GET', urls: urls)
+      def self.from_names(client, names, raise_when_not_found = false)
+        urls = names.map { |name| "https://www.wikidot.com/user:info/#{Wikidotrb::Util::StringUtil.to_unix(name)}" }
+
+        responses = Wikidotrb::Util::RequestUtil.request(client: client, method: 'GET', urls: urls)
 
         users = []
 
@@ -45,7 +46,7 @@ module Wikidotrb
             client: client,
             id: user_id,
             name: name,
-            unix_name: StringUtil.to_unix(name),
+            unix_name: Wikidotrb::Util::StringUtil.to_unix(name),
             avatar_url: avatar_url
           )
         end
@@ -56,15 +57,16 @@ module Wikidotrb
 
     # ユーザーオブジェクトの抽象クラス
     class AbstractUser
-      attr_accessor :client, :id, :name, :unix_name, :avatar_url, :ip
+      attr_accessor :client, :id, :name, :unix_name, :avatar_url, :ip, :ip_masked
 
-      def initialize(client:, id: nil, name: nil, unix_name: nil, avatar_url: nil, ip: nil)
+      def initialize(client:, id: nil, name: nil, unix_name: nil, avatar_url: nil, ip: nil, ip_masked: nil)
         @client = client
         @id = id
         @name = name
         @unix_name = unix_name
         @avatar_url = avatar_url
         @ip = ip
+        @ip_masked = ip_masked
       end
     end
 
@@ -73,7 +75,7 @@ module Wikidotrb
       attr_accessor :client, :id, :name, :unix_name, :avatar_url, :ip
 
       def initialize(client:, id: nil, name: nil, unix_name: nil, avatar_url: nil)
-        super(client: client, id: id, name: name, unix_name: unix_name, avatar_url: avatar_url, ip: nil)
+        super(client: client, id: id, name: name, unix_name: unix_name, avatar_url: avatar_url)
       end
 
       # ユーザー名からユーザーオブジェクトを取得する
@@ -81,36 +83,36 @@ module Wikidotrb
       # @param name [String] ユーザー名
       # @param raise_when_not_found [Boolean] ユーザーが見つからない場合に例外を送出するか
       # @return [User] ユーザーオブジェクト
-      def self.from_name(client:, name:, raise_when_not_found: false)
-        UserCollection.from_names(client: client, names: [name], raise_when_not_found: raise_when_not_found).first
+      def self.from_name(client, name, raise_when_not_found = false)
+        UserCollection.from_names(client, [name], raise_when_not_found).first
       end
     end
 
     # 削除されたユーザーオブジェクト
     class DeletedUser < AbstractUser
       def initialize(client:, id: nil)
-        super(client: client, id: id, name: 'account deleted', unix_name: 'account_deleted', avatar_url: nil, ip: nil)
+        super(client: client, id: id, name: 'account deleted', unix_name: 'account_deleted', avatar_url: nil)
       end
     end
 
     # 匿名ユーザーオブジェクト
     class AnonymousUser < AbstractUser
-      def initialize(client:, ip:)
-        super(client: client, id: nil, name: 'Anonymous', unix_name: 'anonymous', avatar_url: nil, ip: ip)
+      def initialize(client:, ip: nil, ip_masked: nil)
+        super(client: client, id: nil, name: 'Anonymous', unix_name: 'anonymous', avatar_url: nil, ip: ip, ip_masked: ip_masked)
       end
     end
 
     # ゲストユーザーオブジェクト
     class GuestUser < AbstractUser
-      def initialize(client:, name:)
-        super(client: client, id: nil, name: name, unix_name: nil, avatar_url: nil, ip: nil)
+      def initialize(client:, name:, avatar_url:)
+        super(client: client, id: nil, name: name, unix_name: nil, avatar_url: avatar_url)
       end
     end
 
     # Wikidotシステムユーザーオブジェクト
     class WikidotUser < AbstractUser
       def initialize(client:)
-        super(client: client, id: nil, name: 'Wikidot', unix_name: 'wikidot', avatar_url: nil, ip: nil)
+        super(client: client, id: nil, name: 'Wikidot', unix_name: 'wikidot', avatar_url: nil)
       end
     end
   end

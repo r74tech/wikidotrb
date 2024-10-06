@@ -11,6 +11,9 @@ module Wikidotrb
               define_method(method) do |*args, **kwargs|
                 client = nil
 
+                # インスタンス変数として存在するかを最初にチェック
+                client ||= self.client if respond_to?(:client)
+
                 # キーワード引数からclientを探す
                 client = kwargs[:client] if kwargs.key?(:client)
 
@@ -22,9 +25,6 @@ module Wikidotrb
                       break
                     end
                   end
-
-                  # インスタンス変数として存在するかをチェック
-                  client ||= self.client if respond_to?(:client)
                 end
 
                 # clientが見つからない場合はエラーを発生させる
@@ -44,6 +44,9 @@ module Wikidotrb
             define_method(method) do |*args, **kwargs|
               client = nil
 
+              # インスタンス変数として存在するかを最初にチェック
+              client ||= self.client if respond_to?(:client)
+
               # キーワード引数からclientを探す
               client = kwargs[:client] if kwargs.key?(:client)
 
@@ -55,9 +58,6 @@ module Wikidotrb
                     break
                   end
                 end
-
-                # インスタンス変数として存在するかをチェック
-                client ||= self.client if respond_to?(:client)
               end
 
               # clientが見つからない場合はエラーを発生させる

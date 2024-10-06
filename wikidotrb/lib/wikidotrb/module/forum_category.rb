@@ -51,7 +51,7 @@ module Wikidotrb
         return categories if categories.empty?
 
         responses = forum.site.amc_request(
-          categories.map { |category| { "c" => category.id, "moduleName" => "forum/ForumViewCategoryModule" } }
+          bodies: categories.map { |category| { "c" => category.id, "moduleName" => "forum/ForumViewCategoryModule" } }
         )
 
         responses.each_with_index do |response, index|
@@ -128,7 +128,7 @@ module Wikidotrb
         client = @site.client
         update
         responses = @site.amc_request(
-          (1..@pagerno).map { |no| { "p" => no, "c" => @id, "moduleName" => "forum/ForumViewCategoryModule" } }
+          bodies: (1..@pagerno).map { |no| { "p" => no, "c" => @id, "moduleName" => "forum/ForumViewCategoryModule" } }
         )
 
         threads = []
@@ -170,16 +170,16 @@ module Wikidotrb
         client.login_check
 
         response = @site.amc_request(
-          [
-            {
-              "category_id" => @id,
-              "title" => title,
-              "description" => description,
-              "source" => source,
-              "action" => "ForumAction",
-              "event" => "newThread"
-            }
-          ]
+          bodies: [
+                    {
+                      "category_id" => @id,
+                      "title" => title,
+                      "description" => description,
+                      "source" => source,
+                      "action" => "ForumAction",
+                      "event" => "newThread"
+                    }
+                  ]
         ).first
 
         body = JSON.parse(response.body.to_s)

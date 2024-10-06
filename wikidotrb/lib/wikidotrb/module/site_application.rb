@@ -2,7 +2,6 @@ require 'nokogiri'
 require_relative 'site'
 require_relative 'user'
 require_relative '../common/exceptions'
-require_relative '../common/decorators'
 require_relative '../util/parser/odate'
 require_relative '../util/parser/user'
 
@@ -10,8 +9,6 @@ module Wikidotrb
   module Module
     class SiteApplication
       attr_reader :site, :user, :text
-
-      extend Wikidotrb::Common::Decorators
 
       def initialize(site:, user:, text:)
         @site = site
@@ -28,10 +25,10 @@ module Wikidotrb
         # @param site [Site] サイト
         # @return [Array<SiteApplication>] 申請のリスト
         response = site.amc_request(
-          [{ moduleName: 'managesite/ManageSiteMembersApplicationsModule' }]
+          bodies: [{ moduleName: 'managesite/ManageSiteMembersApplicationsModule' }]
         ).first
 
-        body = response.json['body']
+        body = response['body']
 
         if body.include?("WIKIDOT.page.listeners.loginClick(event)")
           raise Wikidotrb::Common::Exceptions::ForbiddenException.new(
@@ -39,7 +36,7 @@ module Wikidotrb
           )
         end
 
-        html = Nokogiri::HTML(response.json['body'])
+        html = Nokogiri::HTML(response['body'])
 
         applications = []
 
@@ -55,7 +52,7 @@ module Wikidotrb
         user_elements.each_with_index do |user_element, i|
           text_wrapper_element = text_wrapper_elements[i]
 
-          user = Wikidotrb::Util::Parser.user(site.client, user_element)
+          user = Wikidotrb::Util::Parser::UserParser.user(site.client, user_element)
           text = text_wrapper_element.css('td')[1].text.strip
 
           applications << SiteApplication.new(site: site, user: user, text: text)
@@ -67,14 +64,13 @@ module Wikidotrb
       def _process(action)
         # 申請を処理する
         # @param action [String] 処理の種類 ('accept' または 'decline')
-
         unless %w[accept decline].include?(action)
           raise ArgumentError.new("Invalid action: #{action}")
         end
 
         begin
           site.amc_request(
-            [{
+            bodies: [{
               action: 'ManageSiteMembershipAction',
               event: 'acceptApplication',
               user_id: user.id,
@@ -103,9 +99,6 @@ module Wikidotrb
       def decline
         _process('decline')
       end
-
-      # メソッドの定義後にデコレータを適用
-      login_required :acquire_all, :_process
     end
   end
 end

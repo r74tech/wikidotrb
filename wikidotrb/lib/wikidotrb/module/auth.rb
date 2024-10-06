@@ -1,7 +1,6 @@
 require 'httpx'
 require 'uri'
 require 'json'
-require 'http-cookie'
 require_relative '../common/exceptions'
 
 module Wikidotrb
@@ -32,36 +31,39 @@ module Wikidotrb
 
         # ステータスコードのチェック
         unless response.status == 200
-          raise Wikidotrb::Common::SessionCreateException.new(
+          raise Wikidotrb::Common::Exceptions::SessionCreateException.new(
             "Login attempt is failed due to HTTP status code: #{response.status}"
           )
         end
 
         # レスポンスボディのチェック
         if response.body.to_s.include?('The login and password do not match')
-          raise Wikidotrb::Common::SessionCreateException.new(
+          raise Wikidotrb::Common::Exceptions::SessionCreateException.new(
             'Login attempt is failed due to invalid username or password'
           )
         end
 
         # クッキーのチェックとパース
         set_cookie_header = response.headers['set-cookie']
-        cookie_jar = HTTP::CookieJar.new
-        HTTP::Cookie.parse(set_cookie_header, URI(url)).each do |cookie|
-          cookie_jar.add(cookie)
+
+        # `set-cookie` が存在しない、または `nil` の場合にエラーを発生
+        if set_cookie_header.nil? || set_cookie_header.empty?
+          raise Wikidotrb::Common::Exceptions::SessionCreateException.new(
+            'Login attempt is failed due to invalid cookies'
+          )
         end
 
         # セッションクッキーを取得
-        session_cookie = cookie_jar.cookies.find { |cookie| cookie.name == 'WIKIDOT_SESSION_ID' }
+        session_cookie = set_cookie_header.match(/WIKIDOT_SESSION_ID=([^;]+)/)
 
         unless session_cookie
-          raise Wikidotrb::Common::SessionCreateException.new(
+          raise Wikidotrb::Common::Exceptions::SessionCreateException.new(
             'Login attempt is failed due to invalid cookies'
           )
         end
 
         # セッションクッキーの設定
-        client.amc_client.header.set_cookie('WIKIDOT_SESSION_ID', session_cookie.value)
+        client.amc_client.header.set_cookie('WIKIDOT_SESSION_ID', session_cookie[1])
       end
 
       # ログアウトする

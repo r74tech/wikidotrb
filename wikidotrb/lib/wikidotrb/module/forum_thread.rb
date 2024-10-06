@@ -30,7 +30,7 @@ module Wikidotrb
 
         client = forum.site.client
         responses = forum.site.amc_request(
-          threads.map { |thread| { "t" => thread.id, "moduleName" => "forum/ForumViewThreadModule" } }
+          bodies: threads.map { |thread| { "t" => thread.id, "moduleName" => "forum/ForumViewThreadModule" } }
         )
 
         responses.each_with_index do |response, index|
@@ -112,7 +112,7 @@ module Wikidotrb
       def posts
         client = @site.client
         responses = @site.amc_request(
-          (1..@pagerno).map { |no| { "pagerNo" => no, "t" => @id, "order" => "", "moduleName" => "forum/ForumViewThreadPostsModule" } }
+          bodies: (1..@pagerno).map { |no| { "pagerNo" => no, "t" => @id, "order" => "", "moduleName" => "forum/ForumViewThreadPostsModule" } }
         )
 
         posts = []
@@ -169,16 +169,16 @@ module Wikidotrb
         return self if title.nil? && description.nil?
 
         @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "title" => @title.nil? ? title : @title,
-              "description" => description.nil? ? @description : description,
-              "action" => "ForumAction",
-              "event" => "saveThreadMeta",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "title" => @title.nil? ? title : @title,
+                      "description" => description.nil? ? @description : description,
+                      "action" => "ForumAction",
+                      "event" => "saveThreadMeta",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
 
         @title = title.nil? ? @title : title
@@ -191,15 +191,15 @@ module Wikidotrb
       def move_to(category_id)
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "categoryId" => category_id,
-              "threadId" => @id,
-              "action" => "ForumAction",
-              "event" => "moveThread",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "categoryId" => category_id,
+                      "threadId" => @id,
+                      "action" => "ForumAction",
+                      "event" => "moveThread",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
       end
 
@@ -207,15 +207,15 @@ module Wikidotrb
       def lock
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "block" => "true",
-              "action" => "ForumAction",
-              "event" => "saveBlock",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "block" => "true",
+                      "action" => "ForumAction",
+                      "event" => "saveBlock",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
         self
       end
@@ -224,14 +224,14 @@ module Wikidotrb
       def unlock
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "action" => "ForumAction",
-              "event" => "saveBlock",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "action" => "ForumAction",
+                      "event" => "saveBlock",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
         self
       end
@@ -240,12 +240,12 @@ module Wikidotrb
       def locked?
         @site.client.login_check
         response = @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "moduleName" => "forum/sub/ForumEditThreadBlockModule"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "moduleName" => "forum/sub/ForumEditThreadBlockModule"
+                    }
+                  ]
         ).first
 
         html = Nokogiri::HTML(response.body.to_s)
@@ -258,15 +258,15 @@ module Wikidotrb
       def stick
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "sticky" => "true",
-              "action" => "ForumAction",
-              "event" => "saveSticky",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "sticky" => "true",
+                      "action" => "ForumAction",
+                      "event" => "saveSticky",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
         self
       end
@@ -275,14 +275,14 @@ module Wikidotrb
       def unstick
         @site.client.login_check
         @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "action" => "ForumAction",
-              "event" => "saveSticky",
-              "moduleName" => "Empty"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "action" => "ForumAction",
+                      "event" => "saveSticky",
+                      "moduleName" => "Empty"
+                    }
+                  ]
         )
         self
       end
@@ -291,12 +291,12 @@ module Wikidotrb
       def sticked?
         @site.client.login_check
         response = @site.amc_request(
-          [
-            {
-              "threadId" => @id,
-              "moduleName" => "forum/sub/ForumEditThreadStickinessModule"
-            }
-          ]
+          bodies: [
+                    {
+                      "threadId" => @id,
+                      "moduleName" => "forum/sub/ForumEditThreadStickinessModule"
+                    }
+                  ]
         ).first
 
         html = Nokogiri::HTML(response.body.to_s)
@@ -312,15 +312,15 @@ module Wikidotrb
         raise Wikidotrb::Common::UnexpectedException, "Post body can not be left empty." if source == ""
 
         response = @site.amc_request(
-          [
-            {
-              "parentId" => parent_id,
-              "title" => title,
-              "source" => source,
-              "action" => "ForumAction",
-              "event" => "savePost"
-            }
-          ]
+          bodies: [
+                    {
+                      "parentId" => parent_id,
+                      "title" => title,
+                      "source" => source,
+                      "action" => "ForumAction",
+                      "event" => "savePost"
+                    }
+                  ]
         ).first
 
         body = JSON.parse(response.body.to_s)
