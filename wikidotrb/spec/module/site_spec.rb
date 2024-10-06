@@ -51,8 +51,12 @@ RSpec.describe Wikidotrb::Module::Site do
 
     before(:each) do
       # Ensure the `new-page` does not exist before each test
-      existing_page = site.page.get(new_page_fullname, raise_when_not_found: false)
-      existing_page&.destroy
+      site.page.get(new_page_fullname, raise_when_not_found: false)&.destroy
+    end
+
+    after(:each) do
+      # Cleanup after each test
+      site.page.get(new_page_fullname, raise_when_not_found: false)&.destroy
     end
 
     context "#get" do
