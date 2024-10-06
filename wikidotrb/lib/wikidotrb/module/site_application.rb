@@ -1,9 +1,11 @@
-require 'nokogiri'
-require_relative 'site'
-require_relative 'user'
-require_relative '../common/exceptions'
-require_relative '../util/parser/odate'
-require_relative '../util/parser/user'
+# frozen_string_literal: true
+
+require "nokogiri"
+require_relative "site"
+require_relative "user"
+require_relative "../common/exceptions"
+require_relative "../util/parser/odate"
+require_relative "../util/parser/user"
 
 module Wikidotrb
   module Module
@@ -25,35 +27,30 @@ module Wikidotrb
         # @param site [Site] サイト
         # @return [Array<SiteApplication>] 申請のリスト
         response = site.amc_request(
-          bodies: [{ moduleName: 'managesite/ManageSiteMembersApplicationsModule' }]
+          bodies: [{ moduleName: "managesite/ManageSiteMembersApplicationsModule" }]
         ).first
 
-        body = response['body']
+        body = response["body"]
 
-        if body.include?("WIKIDOT.page.listeners.loginClick(event)")
-          raise Wikidotrb::Common::Exceptions::ForbiddenException.new(
-            "You are not allowed to access this page"
-          )
-        end
+        raise Wikidotrb::Common::Exceptions::ForbiddenException, "You are not allowed to access this page" if body.include?("WIKIDOT.page.listeners.loginClick(event)")
 
-        html = Nokogiri::HTML(response['body'])
+        html = Nokogiri::HTML(response["body"])
 
         applications = []
 
-        user_elements = html.css('h3 span.printuser')
-        text_wrapper_elements = html.css('table')
+        user_elements = html.css("h3 span.printuser")
+        text_wrapper_elements = html.css("table")
 
         if user_elements.length != text_wrapper_elements.length
-          raise Wikidotrb::Common::Exceptions::UnexpectedException.new(
-            "Length of user_elements and text_wrapper_elements are different"
-          )
+          raise Wikidotrb::Common::Exceptions::UnexpectedException,
+                "Length of user_elements and text_wrapper_elements are different"
         end
 
         user_elements.each_with_index do |user_element, i|
           text_wrapper_element = text_wrapper_elements[i]
 
           user = Wikidotrb::Util::Parser::UserParser.user(site.client, user_element)
-          text = text_wrapper_element.css('td')[1].text.strip
+          text = text_wrapper_element.css("td")[1].text.strip
 
           applications << SiteApplication.new(site: site, user: user, text: text)
         end
@@ -64,40 +61,36 @@ module Wikidotrb
       def _process(action)
         # 申請を処理する
         # @param action [String] 処理の種類 ('accept' または 'decline')
-        unless %w[accept decline].include?(action)
-          raise ArgumentError.new("Invalid action: #{action}")
-        end
+        raise ArgumentError, "Invalid action: #{action}" unless %w[accept decline].include?(action)
 
         begin
           site.amc_request(
             bodies: [{
-              action: 'ManageSiteMembershipAction',
-              event: 'acceptApplication',
+              action: "ManageSiteMembershipAction",
+              event: "acceptApplication",
               user_id: user.id,
               text: "your application has been #{action}ed",
               type: action,
-              moduleName: 'Empty'
+              moduleName: "Empty"
             }]
           )
         rescue Wikidotrb::Common::Exceptions::WikidotStatusCodeException => e
-          if e.status_code == 'no_application'
-            raise Wikidotrb::Common::Exceptions::NotFoundException.new(
-              "Application not found: #{user}"
-            ), e
-          else
-            raise e
-          end
+          raise e unless e.status_code == "no_application"
+
+          raise Wikidotrb::Common::Exceptions::NotFoundException.new(
+            "Application not found: #{user}"
+          ), e
         end
       end
 
       # 申請を承認する
       def accept
-        _process('accept')
+        _process("accept")
       end
 
       # 申請を拒否する
       def decline
-        _process('decline')
+        _process("decline")
       end
     end
   end

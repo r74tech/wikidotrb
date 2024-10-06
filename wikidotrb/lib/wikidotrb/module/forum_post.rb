@@ -1,6 +1,8 @@
-require 'nokogiri'
-require 'date'
-require_relative '../common/exceptions'
+# frozen_string_literal: true
+
+require "nokogiri"
+require "date"
+require_relative "../common/exceptions"
 
 module Wikidotrb
   module Module
@@ -13,11 +15,6 @@ module Wikidotrb
       def initialize(thread:, posts: [])
         super(posts)
         @thread = thread
-      end
-
-      # イテレーションをオーバーライド
-      def each(&block)
-        super(&block)
       end
 
       # IDで投稿を検索する
@@ -78,11 +75,12 @@ module Wikidotrb
     end
 
     class ForumPost
-      attr_accessor :site, :id, :forum, :thread, :parent_id, :created_by, :created_at, :edited_by, :edited_at, :source_text, :source_ele
-      attr_reader :parent, :title, :source
+      attr_accessor :site, :id, :forum, :thread, :parent_id, :created_by, :created_at, :edited_by, :edited_at,
+                    :source_text, :source_ele, :parent, :title, :source
 
       # 初期化メソッド
-      def initialize(site:, id:, forum:, thread: nil, parent_id: nil, created_by: nil, created_at: nil, edited_by: nil, edited_at: nil, source_text: nil, source_ele: nil)
+      def initialize(site:, id:, forum:, thread: nil, parent_id: nil, created_by: nil, created_at: nil, edited_by: nil,
+                     edited_at: nil, source_text: nil, source_ele: nil)
         @site = site
         @id = id
         @forum = forum
@@ -100,19 +98,10 @@ module Wikidotrb
       end
 
       # 親投稿を設定する
-      def parent=(value)
-        @parent = value
-      end
 
       # タイトルを設定する
-      def title=(value)
-        @title = value
-      end
 
       # ソースを設定する
-      def source=(value)
-        @source = value
-      end
 
       # 投稿のURLを取得する
       def get_url
@@ -121,25 +110,19 @@ module Wikidotrb
 
       # 親投稿のゲッターメソッド
       def parent
-        unless @parent
-          ForumPostCollection.new(thread: @thread, posts: [self]).get_parent_post
-        end
+        ForumPostCollection.new(thread: @thread, posts: [self]).get_parent_post unless @parent
         @parent
       end
 
       # タイトルのゲッターメソッド
       def title
-        unless @title
-          ForumPostCollection.new(thread: @thread, posts: [self]).get_post_info
-        end
+        ForumPostCollection.new(thread: @thread, posts: [self]).get_post_info unless @title
         @title
       end
 
       # ソースのゲッターメソッド
       def source
-        unless @source
-          ForumPostCollection.new(thread: @thread, posts: [self]).get_post_info
-        end
+        ForumPostCollection.new(thread: @thread, posts: [self]).get_post_info unless @source
         @source
       end
 
@@ -151,14 +134,14 @@ module Wikidotrb
 
         response = @site.amc_request(
           bodies: [
-                    {
-                      "parentId" => @id,
-                      "title" => title,
-                      "source" => source,
-                      "action" => "ForumAction",
-                      "event" => "savePost"
-                    }
-                  ]
+            {
+              "parentId" => @id,
+              "title" => title,
+              "source" => source,
+              "action" => "ForumAction",
+              "event" => "savePost"
+            }
+          ]
         ).first
         body = JSON.parse(response.body.to_s)
 
@@ -186,28 +169,28 @@ module Wikidotrb
         begin
           response = @site.amc_request(
             bodies: [
-                      {
-                        "postId" => @id,
-                        "threadId" => @thread.id,
-                        "moduleName" => "forum/sub/ForumEditPostFormModule"
-                      }
-                    ]
+              {
+                "postId" => @id,
+                "threadId" => @thread.id,
+                "moduleName" => "forum/sub/ForumEditPostFormModule"
+              }
+            ]
           ).first
           html = Nokogiri::HTML(response.body.to_s)
           current_id = html.at_css("form#edit-post-form>input")[1].get("value").to_i
 
           @site.amc_request(
             bodies: [
-                      {
-                        "postId" => @id,
-                        "currentRevisionId" => current_id,
-                        "title" => title || @title,
-                        "source" => source || @source,
-                        "action" => "ForumAction",
-                        "event" => "saveEditPost",
-                        "moduleName" => "Empty"
-                      }
-                    ]
+              {
+                "postId" => @id,
+                "currentRevisionId" => current_id,
+                "title" => title || @title,
+                "source" => source || @source,
+                "action" => "ForumAction",
+                "event" => "saveEditPost",
+                "moduleName" => "Empty"
+              }
+            ]
           )
         rescue Wikidotrb::Common::WikidotStatusCodeException
           return self
@@ -226,13 +209,13 @@ module Wikidotrb
         @site.client.login_check
         @site.amc_request(
           bodies: [
-                    {
-                      "postId" => @id,
-                      "action" => "ForumAction",
-                      "event" => "deletePost",
-                      "moduleName" => "Empty"
-                    }
-                  ]
+            {
+              "postId" => @id,
+              "action" => "ForumAction",
+              "event" => "deletePost",
+              "moduleName" => "Empty"
+            }
+          ]
         )
       end
     end

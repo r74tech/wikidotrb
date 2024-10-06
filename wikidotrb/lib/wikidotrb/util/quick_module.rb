@@ -1,5 +1,7 @@
-require 'httpx'
-require 'json'
+# frozen_string_literal: true
+
+require "httpx"
+require "json"
 
 # QMCUser構造体の定義
 QMCUser = Struct.new(:id, :name, keyword_init: true)
@@ -15,9 +17,7 @@ class QuickModule
   # @return [Hash] レスポンスのJSONパース結果
   def self._request(module_name:, site_id:, query:)
     # 有効なモジュール名か確認
-    unless ["MemberLookupQModule", "UserLookupQModule", "PageLookupQModule"].include?(module_name)
-      raise ArgumentError, 'Invalid module name'
-    end
+    raise ArgumentError, "Invalid module name" unless %w[MemberLookupQModule UserLookupQModule PageLookupQModule].include?(module_name)
 
     # リクエストURLの構築
     url = "https://www.wikidot.com/quickmodule.php?module=#{module_name}&s=#{site_id}&q=#{query}"
@@ -26,9 +26,7 @@ class QuickModule
     response = HTTPX.get(url, timeout: { operation: 300 })
 
     # ステータスコードのチェック
-    if response.status == 500
-      raise ArgumentError, 'Site is not found'
-    end
+    raise ArgumentError, "Site is not found" if response.status == 500
 
     # JSONレスポンスのパース
     JSON.parse(response.body.to_s)

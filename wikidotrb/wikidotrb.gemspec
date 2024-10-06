@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["r74tech"]
   spec.email = ["r74tech@gmail.com"]
 
-  spec.summary = "A utility library for interacting with Wikidot, inspired by wikidot.py." 
+  spec.summary = "A utility library for interacting with Wikidot, inspired by wikidot.py."
   spec.description = "Wikidotrb is a Ruby library inspired by wikidot.py, providing utility functions to interact with the Wikidot platform, making it easier to automate and manage content."
   spec.homepage = "https://github.com/r74tech/wikidotrb"
   spec.license = "MIT"
@@ -31,14 +31,15 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Specify dependencies
-  spec.add_dependency "httpx", "~> 0.2"
-  spec.add_dependency "nokogiri", "~> 1.12"
   spec.add_dependency "concurrent-ruby", "~> 1.1"
+  spec.add_dependency "httpx", "~> 0.2"
   spec.add_dependency "json", "~> 2.0"
   spec.add_dependency "logger", "~> 1.4"
+  spec.add_dependency "nokogiri", "~> 1.12"
 
   # Development dependencies
-  spec.add_development_dependency "rspec", "~> 3.10"
   spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.10"
   spec.add_development_dependency "rubocop", "~> 1.21"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

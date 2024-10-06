@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Wikidotrb
   module Module
     class PageVoteCollection < Array
@@ -9,11 +11,6 @@ module Wikidotrb
       def initialize(page:, votes: [])
         super(votes)
         @page = page
-      end
-
-      # イテレーションをオーバーライド
-      def each(&block)
-        super(&block)
       end
     end
 

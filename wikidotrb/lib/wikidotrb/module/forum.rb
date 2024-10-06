@@ -1,6 +1,8 @@
-require_relative 'forum_category'
-require_relative 'forum_group'
-require_relative 'forum_thread'
+# frozen_string_literal: true
+
+require_relative "forum_category"
+require_relative "forum_group"
+require_relative "forum_thread"
 
 module Wikidotrb
   module Module
@@ -51,7 +53,7 @@ module Wikidotrb
       # @param site [Site] サイトオブジェクト
       def initialize(site:)
         @site = site
-        @name = 'Forum'
+        @name = "Forum"
         @_groups = nil
         @_categories = nil
         @category = ForumCategoryMethods.new(self)
@@ -60,15 +62,11 @@ module Wikidotrb
 
       # カテゴリメソッドオブジェクトを取得
       # @return [ForumCategoryMethods] カテゴリメソッド
-      def category
-        @category
-      end
+      attr_reader :category
 
       # スレッドメソッドオブジェクトを取得
       # @return [ForumThreadMethods] スレッドメソッド
-      def thread
-        @thread
-      end
+      attr_reader :thread
 
       # フォーラムのURLを取得
       # @return [String] フォーラムのURL
@@ -79,18 +77,14 @@ module Wikidotrb
       # グループのプロパティ
       # @return [ForumGroupCollection] グループコレクション
       def groups
-        if @_groups.nil?
-          ForumGroupCollection.get_groups(site: @site, forum: self)
-        end
+        ForumGroupCollection.get_groups(site: @site, forum: self) if @_groups.nil?
         @_groups
       end
 
       # カテゴリのプロパティ
       # @return [ForumCategoryCollection] カテゴリコレクション
       def categories
-        if @_categories.nil?
-          ForumCategoryCollection.get_categories(site: @site, forum: self)
-        end
+        ForumCategoryCollection.get_categories(site: @site, forum: self) if @_categories.nil?
         @_categories
       end
     end

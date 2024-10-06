@@ -1,6 +1,8 @@
-require 'nokogiri'
-require 'date'
-require_relative 'forum_thread'
+# frozen_string_literal: true
+
+require "nokogiri"
+require "date"
+require_relative "forum_thread"
 
 module Wikidotrb
   module Module
@@ -13,11 +15,6 @@ module Wikidotrb
       def initialize(forum:, categories: [])
         super(categories)
         @forum = forum
-      end
-
-      # イテレーションをオーバーライド
-      def each(&block)
-        super(&block)
       end
 
       # サイトとフォーラムからカテゴリを取得
@@ -59,7 +56,7 @@ module Wikidotrb
           html = Nokogiri::HTML(response.body.to_s)
           statistics = html.at_css("div.statistics").text
           description = html.at_css("div.description-block").text.strip
-          info = html.at_css("div.forum-breadcrumbs").text.match(/([ \S]*) \/ ([ \S]*)/)
+          info = html.at_css("div.forum-breadcrumbs").text.match(%r{([ \S]*) / ([ \S]*)})
           counts = statistics.scan(/\d+/).map(&:to_i)
 
           category.last = nil if category.posts_counts != counts[1]
@@ -84,7 +81,8 @@ module Wikidotrb
       attr_accessor :site, :id, :forum, :title, :description, :group, :threads_counts, :posts_counts, :pagerno
       attr_reader :last
 
-      def initialize(site:, id:, forum:, title: nil, description: nil, group: nil, threads_counts: nil, posts_counts: nil, pagerno: nil, last_thread_id: nil, last_post_id: nil)
+      def initialize(site:, id:, forum:, title: nil, description: nil, group: nil, threads_counts: nil,
+                     posts_counts: nil, pagerno: nil, last_thread_id: nil, last_post_id: nil)
         @site = site
         @id = id
         @forum = forum
@@ -111,9 +109,7 @@ module Wikidotrb
 
       # 最後の投稿を取得
       def last
-        if @_last_thread_id && @_last_post_id && @_last.nil?
-          @_last = @forum.thread.get(@_last_thread_id).get(@_last_post_id)
-        end
+        @_last = @forum.thread.get(@_last_thread_id).get(@_last_post_id) if @_last_thread_id && @_last_post_id && @_last.nil?
         @_last
       end
 
@@ -171,15 +167,15 @@ module Wikidotrb
 
         response = @site.amc_request(
           bodies: [
-                    {
-                      "category_id" => @id,
-                      "title" => title,
-                      "description" => description,
-                      "source" => source,
-                      "action" => "ForumAction",
-                      "event" => "newThread"
-                    }
-                  ]
+            {
+              "category_id" => @id,
+              "title" => title,
+              "description" => description,
+              "source" => source,
+              "action" => "ForumAction",
+              "event" => "newThread"
+            }
+          ]
         ).first
 
         body = JSON.parse(response.body.to_s)

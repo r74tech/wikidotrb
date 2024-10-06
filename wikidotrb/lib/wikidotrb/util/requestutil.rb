@@ -1,5 +1,7 @@
-require 'httpx'
-require 'concurrent'
+# frozen_string_literal: true
+
+require "httpx"
+require "concurrent"
 
 module Wikidotrb
   module Util
@@ -21,12 +23,12 @@ module Wikidotrb
 
             begin
               case method.upcase
-              when 'GET'
+              when "GET"
                 response = HTTPX.get(url)
-              when 'POST'
+              when "POST"
                 response = HTTPX.post(url)
               else
-                raise ArgumentError, 'Invalid method'
+                raise ArgumentError, "Invalid method"
               end
 
               response

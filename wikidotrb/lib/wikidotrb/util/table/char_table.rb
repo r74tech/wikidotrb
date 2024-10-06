@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module Wikidotrb
   module Table
     module CharTable
-
       # 特殊記号・非英語アルファベットを英語アルファベットに変換する
       SPECIAL_CHAR_MAP = {
         "À" => "a",
@@ -470,7 +471,7 @@ module Wikidotrb
         "ԛ" => "q",
         "Ԝ" => "w",
         "ԝ" => "w"
-      }
+      }.freeze
     end
   end
 end

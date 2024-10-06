@@ -1,4 +1,6 @@
-require_relative 'table/char_table'
+# frozen_string_literal: true
+
+require_relative "table/char_table"
 
 module Wikidotrb
   module Util
@@ -17,22 +19,20 @@ module Wikidotrb
         target_str = target_str.downcase
 
         # ASCII以外の文字を削除し、特殊なケースを正規表現で置き換え
-        target_str = target_str.gsub(/[^a-z0-9\-:_]/, '-')
-                               .gsub(/^_/, ':_')
-                               .gsub(/(?<!:)_/, '-')
-                               .gsub(/^-*/, '')
-                               .gsub(/-*$/, '')
-                               .gsub(/-{2,}/, '-')
-                               .gsub(/:{2,}/, ':')
-                               .gsub(':-', ':')
-                               .gsub('-:', ':')
-                               .gsub('_-', '_')
-                               .gsub('-_', '_')
+        target_str = target_str.gsub(/[^a-z0-9\-:_]/, "-")
+                               .gsub(/^_/, ":_")
+                               .gsub(/(?<!:)_/, "-")
+                               .gsub(/^-*/, "")
+                               .gsub(/-*$/, "")
+                               .gsub(/-{2,}/, "-")
+                               .gsub(/:{2,}/, ":")
+                               .gsub(":-", ":")
+                               .gsub("-:", ":")
+                               .gsub("_-", "_")
+                               .gsub("-_", "_")
 
         # 先頭と末尾の':'を削除
-        target_str = target_str.gsub(/^:/, '').gsub(/:$/, '')
-
-        target_str
+        target_str.gsub(/^:/, "").gsub(/:$/, "")
       end
     end
   end

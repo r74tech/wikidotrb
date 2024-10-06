@@ -1,6 +1,8 @@
-require 'nokogiri'
-require 'json'
-require_relative 'forum_category'
+# frozen_string_literal: true
+
+require "nokogiri"
+require "json"
+require_relative "forum_category"
 
 module Wikidotrb
   module Module
@@ -13,11 +15,6 @@ module Wikidotrb
       def initialize(forum:, groups: [])
         super(groups)
         @forum = forum
-      end
-
-      # イテレーションをオーバーライド
-      def each(&block)
-        super(&block)
       end
 
       # サイトとフォーラムからグループを取得

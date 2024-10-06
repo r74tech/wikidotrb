@@ -1,10 +1,12 @@
-require_relative '../common/logger'
-require_relative '../common/exceptions'
-require_relative '../connector/ajax'
-require_relative 'auth'
-require_relative 'private_message'
-require_relative 'site'
-require_relative 'user'
+# frozen_string_literal: true
+
+require_relative "../common/logger"
+require_relative "../common/exceptions"
+require_relative "../connector/ajax"
+require_relative "auth"
+require_relative "private_message"
+require_relative "site"
+require_relative "user"
 
 module Wikidotrb
   module Module
@@ -96,7 +98,7 @@ module Wikidotrb
       attr_reader :user, :private_message, :site
 
       # 基幹クライアント
-      def initialize(username: nil, password: nil, amc_config: nil, logging_level: 'WARN')
+      def initialize(username: nil, password: nil, amc_config: nil, logging_level: "WARN")
         # 最初にロギングレベルを決定する
         Wikidotrb::Common::Logger.level = logging_level
 
@@ -122,11 +124,11 @@ module Wikidotrb
 
       # デストラクタ
       def finalize
-        if @is_logged_in
-          Wikidotrb::Module::HTTPAuthentication.logout(self)
-          @is_logged_in = false
-          @username = nil
-        end
+        return unless @is_logged_in
+
+        Wikidotrb::Module::HTTPAuthentication.logout(self)
+        @is_logged_in = false
+        @username = nil
       end
 
       def to_s
@@ -135,9 +137,8 @@ module Wikidotrb
 
       # ログインチェック
       def login_check
-        unless @is_logged_in
-          raise Wikidotrb::Common::Exceptions::LoginRequiredException.new("Login is required to execute this function")
-        end
+        raise Wikidotrb::Common::Exceptions::LoginRequiredException, "Login is required to execute this function" unless @is_logged_in
+
         nil
       end
     end

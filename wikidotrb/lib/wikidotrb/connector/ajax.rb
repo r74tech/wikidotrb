@@ -1,10 +1,12 @@
-require 'httpx'
-require 'json'
-require 'logger'
-require 'concurrent'
+# frozen_string_literal: true
 
-require_relative '../common/exceptions'
-require_relative '../common/logger'
+require "httpx"
+require "json"
+require "logger"
+require "concurrent"
+
+require_relative "../common/exceptions"
+require_relative "../common/logger"
 
 module Wikidotrb
   module Connector
@@ -15,10 +17,10 @@ module Wikidotrb
       # @param referer [String] Referer
       # @param cookie [Hash] Cookie
       def initialize(content_type: nil, user_agent: nil, referer: nil, cookie: nil)
-        @content_type = content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-        @user_agent = user_agent || 'WikidotRb'
-        @referer = referer || 'https://www.wikidot.com/'
-        @cookie = { 'wikidot_token7' => 123456 }.merge(cookie || {})
+        @content_type = content_type || "application/x-www-form-urlencoded; charset=UTF-8"
+        @user_agent = user_agent || "WikidotRb"
+        @referer = referer || "https://www.wikidot.com/"
+        @cookie = { "wikidot_token7" => 123_456 }.merge(cookie || {})
       end
 
       # Cookieを設定
@@ -45,10 +47,10 @@ module Wikidotrb
       # @return [Hash] ヘッダのハッシュ
       def get_header
         {
-          'Content-Type' => @content_type,
-          'User-Agent' => @user_agent,
-          'Referer' => @referer,
-          'Cookie' => @cookie.map { |name, value| "#{name}=#{value};" }.join
+          "Content-Type" => @content_type,
+          "User-Agent" => @user_agent,
+          "Referer" => @referer,
+          "Cookie" => @cookie.map { |name, value| "#{name}=#{value};" }.join
         }
       end
     end
@@ -69,6 +71,7 @@ module Wikidotrb
 
     class AjaxModuleConnectorClient
       attr_reader :header, :config, :site_name
+
       # AjaxModuleConnectorClientオブジェクトの初期化
       # @param site_name [String] サイト名
       # @param config [AjaxModuleConnectorConfig] クライアントの設定
@@ -89,11 +92,11 @@ module Wikidotrb
         http_url = "http://#{site_name}.wikidot.com"
         https_url = "https://#{site_name}.wikidot.com"
 
-        http_response = HTTPX.get(http_url)        
+        http_response = HTTPX.get(http_url)
         raise NotFoundException, "Site is not found: #{site_name}.wikidot.com" if http_response.status == 404
 
         https_response = HTTPX.get(https_url)
-        https_response.status == 200 || (https_response.status == 301 && https_response.headers['location'].start_with?('https'))
+        https_response.status == 200 || (https_response.status == 301 && https_response.headers["location"].start_with?("https"))
       end
 
       # ajax-module-connector.phpへのリクエストを行う
@@ -116,9 +119,9 @@ module Wikidotrb
               semaphore.acquire
 
               begin
-                protocol = site_ssl_supported ? 'https' : 'http'
+                protocol = site_ssl_supported ? "https" : "http"
                 url = "#{protocol}://#{site_name}.wikidot.com/ajax-module-connector.php"
-                body['wikidot_token7'] = 123456
+                body["wikidot_token7"] = 123_456
                 @logger.debug("Ajax Request: #{url} -> #{body}")
                 response = HTTPX.post(
                   url,
@@ -131,7 +134,8 @@ module Wikidotrb
                   retry_count += 1
                   if retry_count >= @config.attempt_limit
                     @logger.error("AMC is respond HTTP error code: #{response.status} -> #{body}")
-                    raise AMCHttpStatusCodeException.new("AMC is respond HTTP error code: #{response.status}", response.status)
+                    raise AMCHttpStatusCodeException.new("AMC is respond HTTP error code: #{response.status}",
+                                                         response.status)
                   end
 
                   @logger.info("AMC is respond status: #{response.status} (retry: #{retry_count}) -> #{body}")
@@ -146,27 +150,32 @@ module Wikidotrb
                   raise ResponseDataException, "AMC is respond empty data"
                 end
 
-                if response_body['status']
-                  if response_body['status'] == 'try_again'
+                if response_body["status"]
+                  if response_body["status"] == "try_again"
                     retry_count += 1
                     if retry_count >= @config.attempt_limit
                       @logger.error("AMC is respond status: \"try_again\" -> #{body}")
-                      raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new('AMC is respond status: "try_again"', 'try_again')
+                      raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+                        'AMC is respond status: "try_again"', "try_again"
+                      )
                     end
 
                     @logger.info("AMC is respond status: \"try_again\" (retry: #{retry_count})")
                     sleep @config.retry_interval
                     next
-                  elsif response_body['status'] != 'ok'
-                    @logger.error("AMC is respond error status: \"#{response_body['status']}\" -> #{body}")
-                    raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new("AMC is respond error status: \"#{response_body['status']}\"", response_body['status'])
+                  elsif response_body["status"] != "ok"
+                    @logger.error("AMC is respond error status: \"#{response_body["status"]}\" -> #{body}")
+                    raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+                      "AMC is respond error status: \"#{response_body["status"]}\"", response_body["status"]
+                    )
                   end
                 end
 
                 break response_body
               rescue JSON::ParserError
                 @logger.error("AMC is respond non-json data: \"#{response.body}\" -> #{body}")
-                raise Wikidotrb::Common::Exceptions::ResponseDataException.new("AMC is respond non-json data: \"#{response.body}\"")
+                raise Wikidotrb::Common::Exceptions::ResponseDataException,
+                      "AMC is respond non-json data: \"#{response.body}\""
               ensure
                 semaphore.release
               end

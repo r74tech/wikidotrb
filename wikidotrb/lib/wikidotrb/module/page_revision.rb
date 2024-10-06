@@ -1,6 +1,8 @@
-require 'nokogiri'
-require 'date'
-require_relative 'page_source'
+# frozen_string_literal: true
+
+require "nokogiri"
+require "date"
+require_relative "page_source"
 
 module Wikidotrb
   module Module
@@ -13,11 +15,6 @@ module Wikidotrb
       def initialize(page: nil, revisions: [])
         super(revisions)
         @page = page || revisions.first.page
-      end
-
-      # イテレーションをオーバーライド
-      def each(&block)
-        super(&block)
       end
 
       # ソースを取得して設定する
@@ -87,8 +84,7 @@ module Wikidotrb
     end
 
     class PageRevision
-      attr_accessor :page, :id, :rev_no, :created_by, :created_at, :comment
-      attr_reader :source, :html
+      attr_accessor :page, :id, :rev_no, :created_by, :created_at, :comment, :source, :html
 
       # 初期化メソッド
       # @param page [Page] ページオブジェクト
@@ -126,31 +122,21 @@ module Wikidotrb
       # ソースが取得されていなければ取得する
       # @return [PageSource] ソースオブジェクト
       def source
-        unless source_acquired?
-          PageRevisionCollection.new(page: @page, revisions: [self]).get_sources
-        end
+        PageRevisionCollection.new(page: @page, revisions: [self]).get_sources unless source_acquired?
         @source
       end
 
       # ソースのセッターメソッド
-      def source=(value)
-        @source = value
-      end
 
       # HTMLのゲッターメソッド
       # HTMLが取得されていなければ取得する
       # @return [String] HTMLソース
       def html
-        unless html_acquired?
-          PageRevisionCollection.new(page: @page, revisions: [self]).get_htmls
-        end
+        PageRevisionCollection.new(page: @page, revisions: [self]).get_htmls unless html_acquired?
         @html
       end
 
       # HTMLのセッターメソッド
-      def html=(value)
-        @html = value
-      end
     end
   end
 end

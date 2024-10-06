@@ -1,9 +1,11 @@
-require 'httpx'
-require_relative 'forum'
-require_relative 'page'
-require_relative 'site_application'
-require_relative '../common/exceptions'
-require_relative '../common/decorators'
+# frozen_string_literal: true
+
+require "httpx"
+require_relative "forum"
+require_relative "page"
+require_relative "site_application"
+require_relative "../common/exceptions"
+require_relative "../common/decorators"
 
 module Wikidotrb
   module Module
@@ -34,7 +36,8 @@ module Wikidotrb
         res = PageCollection.search_pages(@site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
 
         if res.empty?
-          raise Wikidotrb::Common::Exceptions::NotFoundException.new("Page is not found: #{fullname}") if raise_when_not_found
+          raise Wikidotrb::Common::Exceptions::NotFoundException, "Page is not found: #{fullname}" if raise_when_not_found
+
           return nil
         end
 
@@ -48,7 +51,7 @@ module Wikidotrb
       # @param comment [String] コメント
       # @param force_edit [Boolean] ページが存在する場合に上書きするかどうか
       # @return [Page] 作成されたページオブジェクト
-      def create(fullname:, title: '', source: '', comment: '', force_edit: false)
+      def create(fullname:, title: "", source: "", comment: "", force_edit: false)
         Page.create_or_edit(
           site: @site,
           fullname: fullname,
@@ -94,46 +97,41 @@ module Wikidotrb
 
         # リダイレクトの対応
         while response.status >= 300 && response.status < 400
-          url = response.headers['location']
+          url = response.headers["location"]
           response = HTTPX.with(timeout: timeout).get(url)
         end
 
         # サイトが存在しない場合
-        if response.status == 404
-          raise Wikidotrb::Common::Exceptions::NotFoundException.new(
-            "Site is not found: #{unix_name}.wikidot.com"
-          )
-        end
+        raise Wikidotrb::Common::Exceptions::NotFoundException, "Site is not found: #{unix_name}.wikidot.com" if response.status == 404
 
         # サイトが存在する場合
         source = response.body.to_s
 
         # id : WIKIREQUEST.info.siteId = xxxx;
         id_match = source.match(/WIKIREQUEST\.info\.siteId = (\d+);/)
-        raise Wikidotrb::Common::Exceptions::UnexpectedException.new(
-          "Cannot find site id: #{unix_name}.wikidot.com"
-        ) if id_match.nil?
+        raise Wikidotrb::Common::Exceptions::UnexpectedException, "Cannot find site id: #{unix_name}.wikidot.com" if id_match.nil?
+
         site_id = id_match[1].to_i
 
         # title : titleタグ
-        title_match = source.match(/<title>(.*?)<\/title>/)
-        raise Wikidotrb::Common::Exceptions::UnexpectedException.new(
-          "Cannot find site title: #{unix_name}.wikidot.com"
-        ) if title_match.nil?
+        title_match = source.match(%r{<title>(.*?)</title>})
+        raise Wikidotrb::Common::Exceptions::UnexpectedException, "Cannot find site title: #{unix_name}.wikidot.com" if title_match.nil?
+
         title = title_match[1]
 
         # unix_name : WIKIREQUEST.info.siteUnixName = "xxxx";
         unix_name_match = source.match(/WIKIREQUEST\.info\.siteUnixName = "(.*?)";/)
-        raise Wikidotrb::Common::Exceptions::UnexpectedException.new(
-          "Cannot find site unix_name: #{unix_name}.wikidot.com"
-        ) if unix_name_match.nil?
+        if unix_name_match.nil?
+          raise Wikidotrb::Common::Exceptions::UnexpectedException,
+                "Cannot find site unix_name: #{unix_name}.wikidot.com"
+        end
+
         unix_name = unix_name_match[1]
 
         # domain : WIKIREQUEST.info.domain = "xxxx";
         domain_match = source.match(/WIKIREQUEST\.info\.domain = "(.*?)";/)
-        raise Wikidotrb::Common::Exceptions::UnexpectedException.new(
-          "Cannot find site domain: #{unix_name}.wikidot.com"
-        ) if domain_match.nil?
+        raise Wikidotrb::Common::Exceptions::UnexpectedException, "Cannot find site domain: #{unix_name}.wikidot.com" if domain_match.nil?
+
         domain = domain_match[1]
 
         # SSL対応チェック
@@ -161,7 +159,6 @@ module Wikidotrb
         )
       end
 
-
       # サイトへの未処理の参加申請を取得する
       # @return [Array<SiteApplication>] 未処理の申請リスト
       def get_applications
@@ -172,36 +169,34 @@ module Wikidotrb
       # @param user [User] 招待するユーザー
       # @param text [String] 招待文
       def invite_user(user:, text:)
-        begin
-          amc_request(
-            bodies: [{
-              action: 'ManageSiteMembershipAction',
-              event: 'inviteMember',
-              user_id: user.id,
-              text: text,
-              moduleName: 'Empty'
-            }]
-          )
-        rescue Wikidotrb::Common::Exceptions::WikidotStatusCodeException => e
-          case e.status_code
-          when 'already_invited'
-            raise Wikidotrb::Common::Exceptions::TargetErrorException.new(
-              "User is already invited to #{unix_name}: #{user.name}"
-            ), e
-          when 'already_member'
-            raise Wikidotrb::Common::Exceptions::TargetErrorException.new(
-              "User is already a member of #{unix_name}: #{user.name}"
-            ), e
-          else
-            raise e
-          end
+        amc_request(
+          bodies: [{
+            action: "ManageSiteMembershipAction",
+            event: "inviteMember",
+            user_id: user.id,
+            text: text,
+            moduleName: "Empty"
+          }]
+        )
+      rescue Wikidotrb::Common::Exceptions::WikidotStatusCodeException => e
+        case e.status_code
+        when "already_invited"
+          raise Wikidotrb::Common::Exceptions::TargetErrorException.new(
+            "User is already invited to #{unix_name}: #{user.name}"
+          ), e
+        when "already_member"
+          raise Wikidotrb::Common::Exceptions::TargetErrorException.new(
+            "User is already a member of #{unix_name}: #{user.name}"
+          ), e
+        else
+          raise e
         end
       end
 
       # サイトのURLを取得する
       # @return [String] サイトのURL
       def get_url
-        "http#{ssl_supported ? 's' : ''}://#{domain}"
+        "http#{ssl_supported ? "s" : ""}://#{domain}"
       end
 
       # `invite_user`にデコレータを適用

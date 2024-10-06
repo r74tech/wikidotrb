@@ -1,16 +1,14 @@
+# frozen_string_literal: true
+
 module Wikidotrb
   module Common
     module Exceptions
-
       # ---
       # 基底クラス
       # ---
 
       class WikidotException < StandardError
         # 独自例外の基底クラス
-        def initialize(message)
-          super(message)
-        end
       end
 
       # ---
@@ -19,9 +17,6 @@ module Wikidotrb
 
       class UnexpectedException < WikidotException
         # 予期せぬ例外が発生したときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       # ---
@@ -30,16 +25,10 @@ module Wikidotrb
 
       class SessionCreateException < WikidotException
         # セッションの作成に失敗したときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       class LoginRequiredException < WikidotException
         # ログインが必要なメソッドのときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       # ---
@@ -48,9 +37,6 @@ module Wikidotrb
 
       class AjaxModuleConnectorException < WikidotException
         # ajax-module-connector.phpへのリクエストに失敗したときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       class AMCHttpStatusCodeException < AjaxModuleConnectorException
@@ -76,9 +62,6 @@ module Wikidotrb
 
       class ResponseDataException < AjaxModuleConnectorException
         # AMCから返却されたデータが不正だったときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       # ---
@@ -87,30 +70,18 @@ module Wikidotrb
 
       class NotFoundException < WikidotException
         # サイトやページ・ユーザが見つからなかったときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       class TargetExistsException < WikidotException
         # 対象が既に存在しているときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       class TargetErrorException < WikidotException
         # メソッドの対象としたオブジェクトに操作が適用できないときの例外
-        def initialize(message)
-          super(message)
-        end
       end
 
       class ForbiddenException < WikidotException
         # 権限がないときの例外
-        def initialize(message)
-          super(message)
-        end
       end
     end
   end

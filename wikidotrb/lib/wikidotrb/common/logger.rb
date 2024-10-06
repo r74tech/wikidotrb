@@ -1,4 +1,6 @@
-require 'logger'
+# frozen_string_literal: true
+
+require "logger"
 
 module Wikidotrb
   module Common
