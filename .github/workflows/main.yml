@@ -23,7 +23,20 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+
+    - name: Install dependencies
+      run: bundle install --jobs 4 --retry 3
+      working-directory: wikidotrb
+
+    - name: Make config.yml
+      run: |
+        echo "test:" > wikidotrb/config.yml
+        echo "  username: '${{ secrets.WIKIDOT_USERNAME }}'" >> wikidotrb/config.yml
+        echo "  password: '${{ secrets.WIKIDOT_PASSWORD }}'" >> wikidotrb/config.yml
+        echo "  site: '${{ secrets.WIKIDOT_SITE }}'" >> wikidotrb/config.yml
+      shell: bash
+
+    
     - name: Run the default task
       run: bundle exec rake
-      # working-directory を指定
       working-directory: wikidotrb
