@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
 
   # Specify dependencies
   spec.add_dependency "concurrent-ruby", "~> 1.1"
-  spec.add_dependency "httpx", "~> 0.2"
+  spec.add_dependency "httpx", ">= 0.2", "< 2.0"
   spec.add_dependency "json", "~> 2.0"
   spec.add_dependency "logger", "~> 1.4"
   spec.add_dependency "nokogiri", "~> 1.12"
