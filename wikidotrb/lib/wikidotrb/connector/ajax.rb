@@ -130,12 +130,18 @@ module Wikidotrb
                   timeout: { operation: @config.request_timeout }
                 )
 
+                # Check for an ErrorResponse object
+                if response.is_a?(HTTPX::ErrorResponse)
+                  @logger.error("AMC is respond error: #{response.error} -> #{body}")
+                  raise AMCHttpStatusCodeException.new("AMC encountered an error: #{response.error}", nil)
+                end
+
+                # Check for status on a successful response
                 if response.status != 200
                   retry_count += 1
                   if retry_count >= @config.attempt_limit
                     @logger.error("AMC is respond HTTP error code: #{response.status} -> #{body}")
-                    raise AMCHttpStatusCodeException.new("AMC is respond HTTP error code: #{response.status}",
-                                                         response.status)
+                    raise AMCHttpStatusCodeException.new("AMC is respond HTTP error code: #{response.status}", response.status)
                   end
 
                   @logger.info("AMC is respond status: #{response.status} (retry: #{retry_count}) -> #{body}")
