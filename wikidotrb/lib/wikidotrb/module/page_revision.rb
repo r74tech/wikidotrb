@@ -33,7 +33,7 @@ module Wikidotrb
         )
 
         responses.each_with_index do |response, index|
-          body = JSON.parse(response.body.to_s)["body"]
+          body = response["body"]
           body_html = Nokogiri::HTML(body)
           target_revisions[index].source = PageSource.new(
             page: page,
@@ -60,7 +60,7 @@ module Wikidotrb
         )
 
         responses.each_with_index do |response, index|
-          body = JSON.parse(response.body.to_s)["body"]
+          body = response["body"]
           # HTMLソースの抽出
           source = body.split(
             "onclick=\"document.getElementById('page-version-info').style.display='none'\">",

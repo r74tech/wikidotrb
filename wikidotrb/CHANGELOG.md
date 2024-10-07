@@ -26,3 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Remove debug `puts` statement from `PageCollection` instantiation.
+
+## [3.0.7.pre.4] - 2024-10-08
+
+### Fixed
+- Fixed an issue where the `acquire_sources` and `acquire_htmls` methods incorrectly parsed the `response` object. Now directly access `response["body"]` without unnecessary parsing.
