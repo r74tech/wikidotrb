@@ -12,7 +12,13 @@ module Wikidotrb
         # @param elem [Nokogiri::XML::Element] パース対象の要素（printuserクラスがついた要素）
         # @return [AbstractUser] パースされて得られたユーザーオブジェクト
         def self.parse(client, elem)
-          return nil if elem.nil? || !elem.is_a?(Nokogiri::XML::Element)
+          if elem.nil?
+            return nil
+          elsif !elem.is_a?(Nokogiri::XML::Element)
+            # 文字列であることを仮定し、Nokogiriで変換する
+            parsed_doc = Nokogiri::HTML.fragment(elem.to_s)
+            elem = parsed_doc.children.first
+          end
 
           if elem["class"]&.include?("deleted")
             # "deleted"クラスがある場合はDeletedUser

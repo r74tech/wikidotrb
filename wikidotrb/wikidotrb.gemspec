@@ -4,7 +4,7 @@ require_relative "lib/wikidotrb/version"
 
 Gem::Specification.new do |spec|
   spec.name = "wikidotrb"
-  spec.version = "3.0.7.pre"
+  spec.version = "3.0.7.pre.1"
   spec.authors = ["r74tech"]
   spec.email = ["r74tech@gmail.com"]
 
