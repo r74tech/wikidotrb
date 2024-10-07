@@ -21,3 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Corrected the instantiation of `PageRevisionCollection` by ensuring it properly passes `page` and `revisions` as named parameters.
+
+## [3.0.7.pre.3] - 2024-10-08
+
+### Fixed
+- Remove debug `puts` statement from `PageCollection` instantiation.

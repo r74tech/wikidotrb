@@ -294,10 +294,6 @@ module Wikidotrb
               created_at: created_at,
               comment: comment
             )
-
-            puts "Revisions found: #{revs.size}"
-            puts "First Revision: #{revs.first.inspect}" unless revs.empty?
-
           end
           pages[index].revisions = revs
         end
