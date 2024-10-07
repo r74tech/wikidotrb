@@ -16,3 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Improved `UserParser.parse` method to convert non-`Nokogiri::XML::Element` elements properly before processing.
+
+## [3.0.7.pre.2] - 2024-10-08
+
+### Fixed
+- Corrected the instantiation of `PageRevisionCollection` by ensuring it properly passes `page` and `revisions` as named parameters.

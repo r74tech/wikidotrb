@@ -275,6 +275,8 @@ module Wikidotrb
           body = response["body"]
           revs = []
           body_html = Nokogiri::HTML(body)
+          puts body_html.inspect
+
 
           body_html.css("table.page-history > tr[id^=revision-row-]").each do |rev_element|
             rev_id = rev_element["id"].gsub("revision-row-", "").to_i
@@ -284,7 +286,6 @@ module Wikidotrb
             created_by = Wikidotrb::Util::Parser::UserParser.parse(site.client, tds[4].css("span.printuser").first)
             created_at = Wikidotrb::Util::Parser::ODateParser.parse(tds[5].css("span.odate").first)
             comment = tds[6].text.strip
-
             revs << PageRevision.new(
               page: pages[index],
               id: rev_id,
@@ -293,6 +294,10 @@ module Wikidotrb
               created_at: created_at,
               comment: comment
             )
+
+            puts "Revisions found: #{revs.size}"
+            puts "First Revision: #{revs.first.inspect}" unless revs.empty?
+
           end
           pages[index].revisions = revs
         end
@@ -438,7 +443,7 @@ module Wikidotrb
 
       def revisions
         PageCollection.new(site: @site, pages: [self]).get_page_revisions if @_revisions.nil?
-        PageRevisionCollection.new(self, @_revisions)
+        PageRevisionCollection.new(page: self, revisions: @_revisions)
       end
 
       def revisions=(value)
