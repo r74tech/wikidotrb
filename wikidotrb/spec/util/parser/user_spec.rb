@@ -153,6 +153,15 @@ RSpec.describe Wikidotrb::Util::Parser::UserParser do
       end
     end
 
+    context "(user deleted)の場合" do
+      let(:html_string) { "(user deleted)" }
+
+      it "DeletedUserオブジェクトを返すこと" do
+        user = described_class.parse(client, html_string)
+        expect(user).to be_a_kind_of(Wikidotrb::Module::DeletedUser)
+      end
+    end
+
     context "要素がNokogiri::XML::Elementではない場合" do
       let(:html_string) { "Just a string, not an element" }
 

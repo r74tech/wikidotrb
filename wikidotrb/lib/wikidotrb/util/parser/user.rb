@@ -14,34 +14,33 @@ module Wikidotrb
         def self.parse(client, elem)
           if elem.nil?
             return nil
+          elsif deleted_user_string?(elem)
+            # Handle "(user deleted)" case
+            return Wikidotrb::Module::DeletedUser.new(client: client)
           elsif !elem.is_a?(Nokogiri::XML::Element)
-            # 文字列であることを仮定し、Nokogiriで変換する
+            # Assume it is a string and parse it using Nokogiri
             parsed_doc = Nokogiri::HTML.fragment(elem.to_s)
             elem = parsed_doc.children.first
           end
 
           if elem["class"]&.include?("deleted")
-            # "deleted"クラスがある場合はDeletedUser
             parse_deleted_user(client, elem)
 
           elsif elem["class"]&.include?("anonymous")
-            # "anonymous"クラスがある場合はAnonymousUser
             parse_anonymous_user(client, elem)
 
           elsif gravatar_avatar?(elem)
-            # "gravatar.com"を含むsrc属性のimg要素はGuestUser
-            # ref: https://www.wikidot.com/more:explore-features#toc13
             parse_guest_user(client, elem)
 
           elsif elem.text.strip == "Wikidot"
-            # テキストが"Wikidot"の場合はWikidotUser
             parse_wikidot_user(client)
 
           else
-            # それ以外はUser
             parse_regular_user(client, elem)
           end
         end
+
+        private
 
         def self.parse_deleted_user(client, elem)
           id = elem["data-id"].to_i
@@ -73,6 +72,10 @@ module Wikidotrb
 
         def self.parse_regular_user(client, elem)
           user_anchor = elem.css("a").last
+
+          # user_anchorがnilの場合はnilを返す
+          return nil if user_anchor.nil?
+
           user_name = user_anchor.text.strip
           user_unix = user_anchor["href"].to_s.gsub("http://www.wikidot.com/user:info/", "")
           user_id = user_anchor["onclick"].to_s.match(/WIKIDOT.page.listeners.userInfo\((\d+)\)/)[1].to_i
@@ -90,6 +93,12 @@ module Wikidotrb
           avatar_elem = elem.at_css("img")
           avatar_elem && avatar_elem["src"].include?("gravatar.com")
         end
+
+        # Check if the input is specifically the string "(user deleted)"
+        def self.deleted_user_string?(elem)
+          elem.is_a?(String) && elem.strip == "(user deleted)"
+        end
+
       end
     end
   end

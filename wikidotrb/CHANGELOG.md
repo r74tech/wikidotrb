@@ -36,3 +36,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Remove debug `puts` statement from `PageCollection` instantiation.
+
+## [3.0.7.pre.6] - 2024-10-08
+
+### Changed
+- Refactored `UserParser.parse` to better handle the string `"(user deleted)"` as input. 
+
+### Added
+- Private helper method `deleted_user_string?` to clearly separate the logic for parsing `"(user deleted)"`.
+
+### Improved
+- Made parsing helper methods (`parse_deleted_user`, `parse_anonymous_user`, `parse_guest_user`, `parse_wikidot_user`, `parse_regular_user`) private to encapsulate their functionality.
+
+### Fixed
+- Added `nil` check for `user_anchor` in `parse_regular_user` to prevent errors when user information is missing.
