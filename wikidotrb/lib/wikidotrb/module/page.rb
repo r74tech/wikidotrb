@@ -275,8 +275,6 @@ module Wikidotrb
           body = response["body"]
           revs = []
           body_html = Nokogiri::HTML(body)
-          puts body_html.inspect
-
 
           body_html.css("table.page-history > tr[id^=revision-row-]").each do |rev_element|
             rev_id = rev_element["id"].gsub("revision-row-", "").to_i
