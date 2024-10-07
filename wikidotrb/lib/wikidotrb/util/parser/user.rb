@@ -40,8 +40,6 @@ module Wikidotrb
           end
         end
 
-        private
-
         def self.parse_deleted_user(client, elem)
           id = elem["data-id"].to_i
           Wikidotrb::Module::DeletedUser.new(client: client, id: id)
@@ -98,7 +96,6 @@ module Wikidotrb
         def self.deleted_user_string?(elem)
           elem.is_a?(String) && elem.strip == "(user deleted)"
         end
-
       end
     end
   end
