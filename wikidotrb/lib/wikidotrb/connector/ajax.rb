@@ -75,7 +75,6 @@ module Wikidotrb
       # AjaxModuleConnectorClientオブジェクトの初期化
       # @param site_name [String] サイト名
       # @param config [AjaxModuleConnectorConfig] クライアントの設定
-
       def initialize(site_name:, config: nil)
         raise ArgumentError, "site_name cannot be nil" if site_name.nil?
 
@@ -130,13 +129,19 @@ module Wikidotrb
                   timeout: { operation: @config.request_timeout }
                 )
 
-                # Check for an ErrorResponse object
+                # エラーレスポンスを処理
                 if response.is_a?(HTTPX::ErrorResponse)
                   @logger.error("AMC is respond error: #{response.error} -> #{body}")
-                  raise AMCHttpStatusCodeException.new("AMC encountered an error: #{response.error}", nil)
+                  retry_count += 1
+                  if retry_count >= @config.attempt_limit
+                    raise AMCHttpStatusCodeException.new("AMC encountered an error: #{response.error}", nil)
+                  end
+                  @logger.info("AMC is retrying after error: #{response.error} (retry: #{retry_count})")
+                  sleep @config.retry_interval
+                  next
                 end
 
-                # Check for status on a successful response
+                # 通常レスポンスのステータスを確認
                 if response.status != 200
                   retry_count += 1
                   if retry_count >= @config.attempt_limit
