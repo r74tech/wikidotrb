@@ -10,8 +10,7 @@ RSpec.describe Wikidotrb::Module::Site do
   let(:client) { Wikidotrb::Module::Client.new(username: username, password: password) }
   let(:site) { Wikidotrb::Module::Site.from_unix_name(client: client, unix_name: site_domain) }
 
-  # 新しいページに関する情報を定義
-  let(:new_page_fullname) { "new-page" }
+  let(:new_page_fullname) { "new-page-#{Time.now.to_i}" }
   let(:page_title) { "Test Page Title" }
   let(:page_source) { "This is a test page." }
 
@@ -50,7 +49,7 @@ RSpec.describe Wikidotrb::Module::Site do
     end
 
     before(:each) do
-      # Ensure the `new-page` does not exist before each test
+      # Ensure the `new_page_fullname` does not exist before each test
       site.page.get(new_page_fullname, raise_when_not_found: false)&.destroy
     end
 

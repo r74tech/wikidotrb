@@ -14,9 +14,10 @@ RSpec.describe Wikidotrb::Module::Page do
   let(:client) { Wikidotrb::Module::Client.new(username: username, password: password) }
   let(:site) { client.site.get(site_domain) }
 
-  before(:all) do
-    # Assign the test_page_name once before all examples run
-    @test_page_name = "test-page-#{Time.now.to_i}"
+  before(:each) do |example|
+    # テスト名の末尾を元にページ名を動的に生成
+    suffix = example.description.split.last.downcase
+    @test_page_name = "test-page-#{suffix}-#{Time.now.to_i}"
   end
 
   describe "Page management" do
@@ -49,41 +50,39 @@ RSpec.describe Wikidotrb::Module::Page do
       client.finalize if client.is_logged_in
     end
 
-  context "Creating a page" do
-    it "新しいページを作成できること" do
-      # ページ作成時にロックがかかっている場合の対応
-      page = nil
-      begin
-        page = site.page.create(
+    context "Creating a page" do
+      it "新しいページを作成できる_create" do
+        page = nil
+        begin
+          page = site.page.create(
+            fullname: @test_page_name,
+            title: test_page_title,
+            source: test_page_source,
+            force_edit: true
+          )
+        rescue Wikidotrb::Common::Exceptions::TargetErrorException => e
+          if e.message.include?("locked")
+            sleep(1)
+            retry
+          else
+            raise e
+          end
+        end
+        expect(page.fullname).to eq(@test_page_name)
+        expect(page.title).to eq(test_page_title)
+        expect(page.source.wiki_text).to eq(test_page_source)
+      end
+    end
+
+    context "Editing a page" do
+      it "既存のページを編集できる_edit" do
+        page = site.page.get(@test_page_name, raise_when_not_found: false)
+        page ||= site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
           source: test_page_source,
           force_edit: true
         )
-      rescue Wikidotrb::Common::Exceptions::TargetErrorException => e
-        if e.message.include?("locked")
-          sleep(1)
-          retry
-        else
-          raise e
-        end
-      end
-      expect(page.fullname).to eq(@test_page_name)
-      expect(page.title).to eq(test_page_title)
-      expect(page.source.wiki_text).to eq(test_page_source)
-    end
-  end
-
-  context "Editing a page" do
-    it "既存のページを編集できること" do
-      # 既存のページがある場合はスキップ、または再試行
-      page = site.page.get(@test_page_name, raise_when_not_found: false)
-      page ||= site.page.create(
-        fullname: @test_page_name,
-        title: test_page_title,
-        source: test_page_source,
-        force_edit: true
-      )
 
       # ページを編集
       new_source = "This is the updated content of the page."
@@ -97,8 +96,7 @@ RSpec.describe Wikidotrb::Module::Page do
 
 
     context "Searching for pages" do
-      it "指定したクエリに基づいてページを検索できること" do
-        # ページ作成
+      it "指定したクエリに基づいてページを検索できる_search" do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
@@ -116,8 +114,7 @@ RSpec.describe Wikidotrb::Module::Page do
     end
 
     context "Deleting a page" do
-      it "既存のページを削除できること" do
-        # ページ作成
+      it "既存のページを削除できる_delete" do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
@@ -128,10 +125,8 @@ RSpec.describe Wikidotrb::Module::Page do
         page = site.page.get(@test_page_name)
         expect(page).not_to be_nil
 
-        # ページを削除
         page.destroy
 
-        # 削除後の存在確認
         expect do
           site.page.get(@test_page_name)
         end.to raise_error(Wikidotrb::Common::Exceptions::NotFoundException)
