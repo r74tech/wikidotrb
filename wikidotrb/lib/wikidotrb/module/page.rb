@@ -164,7 +164,7 @@ module Wikidotrb
           raise e
         end
 
-        puts "response_data: #{response_data.inspect}"
+        puts "response_data: #{query_dict.inspect} -> #{response_data.inspect}"
 
         body = response_data["body"]
         first_page_html_body = Nokogiri::HTML(body)
@@ -569,22 +569,9 @@ module Wikidotrb
           )
         end
 
-        retries = 3
-        retry_interval = 5
-
-        begin
-          res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
-          puts "Search result: #{res.inspect}"
-          raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
-        rescue Wikidotrb::Common::Exceptions::NotFoundException => e
-          retries -= 1
-          if retries > 0
-            sleep retry_interval
-            retry
-          else
-            raise e
-          end
-        end
+        res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
+        puts "Search result: #{res.inspect}"
+        raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
 
         res[0]
       end

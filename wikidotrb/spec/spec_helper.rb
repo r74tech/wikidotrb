@@ -23,5 +23,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     puts "Starting RSpec suite with test user: #{CONFIG["username"]}"
+    Wikidotrb::Common::Logger.level = Logger::DEBUG
   end
 end
