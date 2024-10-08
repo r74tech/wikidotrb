@@ -169,6 +169,8 @@ module Wikidotrb
 
         raise ResponseDataException, "AMC is respond empty data" if response_body.nil? || response_body.empty?
 
+        puts "response_body: #{body} -> #{response_body}"
+
         handle_wikidot_status(response_body, body, retry_count)
       rescue JSON::ParserError
         @logger.error("AMC is respond non-json data: \"#{response.body}\" -> #{body}")

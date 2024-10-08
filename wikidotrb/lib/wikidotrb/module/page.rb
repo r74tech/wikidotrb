@@ -164,8 +164,6 @@ module Wikidotrb
           raise e
         end
 
-        puts "response_data: #{query_dict.inspect} -> #{response_data.inspect}"
-
         body = response_data["body"]
         first_page_html_body = Nokogiri::HTML(body)
 
