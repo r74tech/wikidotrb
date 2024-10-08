@@ -111,92 +111,93 @@ module Wikidotrb
         site_ssl_supported ||= check_existence_and_ssl(site_name)
 
         tasks = bodies.map do |body|
-          Concurrent::Promises.future do
-            retry_count = 0
-
-            loop do
-              semaphore.acquire
-
-              begin
-                protocol = site_ssl_supported ? "https" : "http"
-                url = "#{protocol}://#{site_name}.wikidot.com/ajax-module-connector.php"
-                body["wikidot_token7"] = 123_456
-                @logger.debug("Ajax Request: #{url} -> #{body}")
-                response = HTTPX.post(
-                  url,
-                  headers: @header.get_header,
-                  form: body,
-                  timeout: { operation: @config.request_timeout }
-                )
-
-                # エラーレスポンスを処理
-                if response.is_a?(HTTPX::ErrorResponse)
-                  @logger.error("AMC is respond error: #{response.error} -> #{body}")
-                  retry_count += 1
-                  if retry_count >= @config.attempt_limit
-                    raise AMCHttpStatusCodeException.new("AMC encountered an error: #{response.error}", nil)
-                  end
-                  @logger.info("AMC is retrying after error: #{response.error} (retry: #{retry_count})")
-                  sleep @config.retry_interval
-                  next
-                end
-
-                # 通常レスポンスのステータスを確認
-                if response.status != 200
-                  retry_count += 1
-                  if retry_count >= @config.attempt_limit
-                    @logger.error("AMC is respond HTTP error code: #{response.status} -> #{body}")
-                    raise AMCHttpStatusCodeException.new("AMC is respond HTTP error code: #{response.status}", response.status)
-                  end
-
-                  @logger.info("AMC is respond status: #{response.status} (retry: #{retry_count}) -> #{body}")
-                  sleep @config.retry_interval
-                  next
-                end
-
-                response_body = JSON.parse(response.body.to_s)
-
-                if response_body.nil? || response_body.empty?
-                  @logger.error("AMC is respond empty data -> #{body}")
-                  raise ResponseDataException, "AMC is respond empty data"
-                end
-
-                if response_body["status"]
-                  if response_body["status"] == "try_again"
-                    retry_count += 1
-                    if retry_count >= @config.attempt_limit
-                      @logger.error("AMC is respond status: \"try_again\" -> #{body}")
-                      raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
-                        'AMC is respond status: "try_again"', "try_again"
-                      )
-                    end
-
-                    @logger.info("AMC is respond status: \"try_again\" (retry: #{retry_count})")
-                    sleep @config.retry_interval
-                    next
-                  elsif response_body["status"] != "ok"
-                    @logger.error("AMC is respond error status: \"#{response_body["status"]}\" -> #{body}")
-                    raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
-                      "AMC is respond error status: \"#{response_body["status"]}\"", response_body["status"]
-                    )
-                  end
-                end
-
-                break response_body
-              rescue JSON::ParserError
-                @logger.error("AMC is respond non-json data: \"#{response.body}\" -> #{body}")
-                raise Wikidotrb::Common::Exceptions::ResponseDataException,
-                      "AMC is respond non-json data: \"#{response.body}\""
-              ensure
-                semaphore.release
-              end
-            end
-          end
+          Concurrent::Promises.future { perform_request(body, semaphore, site_name, site_ssl_supported) }
         end
 
         results = Concurrent::Promises.zip(*tasks).value!
-
         return_exceptions ? results : results.each { |r| raise r if r.is_a?(Exception) }
+      end
+
+      private
+
+      def perform_request(body, semaphore, site_name, site_ssl_supported)
+        retry_count = 0
+
+        loop do
+          semaphore.acquire
+
+          begin
+            protocol = site_ssl_supported ? "https" : "http"
+            url = "#{protocol}://#{site_name}.wikidot.com/ajax-module-connector.php"
+            body["wikidot_token7"] = 123_456
+            @logger.debug("Ajax Request: #{url} -> #{body}")
+            response = HTTPX.post(
+              url,
+              headers: @header.get_header,
+              form: body,
+              timeout: { operation: @config.request_timeout }
+            )
+
+            return handle_response(response, body, retry_count)
+          ensure
+            semaphore.release
+          end
+        end
+      end
+
+      def handle_response(response, body, retry_count)
+        if response.is_a?(HTTPX::ErrorResponse)
+          @logger.error("AMC is respond error: #{response.error} -> #{body}")
+          retry_count += 1
+          return retry_or_raise(retry_count, body) if retry_count >= @config.attempt_limit
+
+          @logger.info("AMC is retrying after error: #{response.error} (retry: #{retry_count})")
+          sleep @config.retry_interval
+          return nil
+        end
+
+        if response.status != 200
+          retry_count += 1
+          return retry_or_raise(retry_count, body) if retry_count >= @config.attempt_limit
+
+          @logger.info("AMC is respond status: #{response.status} (retry: #{retry_count}) -> #{body}")
+          sleep @config.retry_interval
+          return nil
+        end
+
+        response_body = JSON.parse(response.body.to_s)
+
+        raise ResponseDataException, "AMC is respond empty data" if response_body.nil? || response_body.empty?
+
+        handle_wikidot_status(response_body, body, retry_count)
+      rescue JSON::ParserError
+        @logger.error("AMC is respond non-json data: \"#{response.body}\" -> #{body}")
+        raise Wikidotrb::Common::Exceptions::ResponseDataException, "AMC is respond non-json data: \"#{response.body}\""
+      end
+
+      def handle_wikidot_status(response_body, body, retry_count)
+        if response_body["status"]
+          if response_body["status"] == "try_again"
+            retry_count += 1
+            return retry_or_raise(retry_count, body, "try_again") if retry_count >= @config.attempt_limit
+
+            @logger.info("AMC is respond status: \"try_again\" (retry: #{retry_count})")
+            sleep @config.retry_interval
+            return nil
+          elsif response_body["status"] != "ok"
+            raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+              "AMC is respond error status: \"#{response_body["status"]}\"", response_body["status"]
+            )
+          end
+        end
+
+        response_body
+      end
+
+      def retry_or_raise(retry_count, body, status = nil)
+        message = status.nil? ? "AMC encountered an error" : "AMC is respond status: \"#{status}\""
+        @logger.error("#{message} -> #{body}")
+        raise AMCHttpStatusCodeException.new(message, nil)
       end
     end
   end
