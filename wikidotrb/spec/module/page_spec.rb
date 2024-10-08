@@ -57,7 +57,8 @@ RSpec.describe Wikidotrb::Module::Page do
         page = site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
-          source: test_page_source
+          source: test_page_source,
+          force_edit: true
         )
       rescue Wikidotrb::Common::Exceptions::TargetErrorException => e
         if e.message.include?("locked")
@@ -80,7 +81,8 @@ RSpec.describe Wikidotrb::Module::Page do
       page ||= site.page.create(
         fullname: @test_page_name,
         title: test_page_title,
-        source: test_page_source
+        source: test_page_source,
+        force_edit: true
       )
 
       # ページを編集
@@ -100,7 +102,8 @@ RSpec.describe Wikidotrb::Module::Page do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
-          source: test_page_source
+          source: test_page_source,
+          force_edit: true
         )
 
         pages = site.pages.search(
@@ -118,7 +121,8 @@ RSpec.describe Wikidotrb::Module::Page do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
-          source: test_page_source
+          source: test_page_source,
+          force_edit: true
         )
 
         page = site.page.get(@test_page_name)

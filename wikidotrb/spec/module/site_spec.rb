@@ -82,7 +82,8 @@ RSpec.describe Wikidotrb::Module::Site do
         @cached_page ||= site.page.create(
           fullname: new_page_fullname,
           title: page_title,
-          source: page_source
+          source: page_source,
+          force_edit: true
         )
         expect(@cached_page.title).to eq(page_title)
         expect(@cached_page.source.wiki_text).to eq(page_source)
@@ -93,7 +94,8 @@ RSpec.describe Wikidotrb::Module::Site do
         @cached_page ||= site.page.create(
           fullname: new_page_fullname,
           title: page_title,
-          source: page_source
+          source: page_source,
+          force_edit: true
         )
 
         # キャッシュされたページが存在していることを確認
