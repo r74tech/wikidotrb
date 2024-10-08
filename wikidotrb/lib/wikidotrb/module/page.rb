@@ -533,11 +533,9 @@ module Wikidotrb
         end
 
         is_exist = page_lock_response_data.key?("page_revision_id")
-        
-        if raise_on_exists && is_exist
-          raise Wikidotrb::Common::Exceptions::TargetExistsException, "Page #{fullname} already exists"
-        end
-        
+
+        raise Wikidotrb::Common::Exceptions::TargetExistsException, "Page #{fullname} already exists" if raise_on_exists && is_exist
+
         raise ArgumentError, "page_id must be specified when editing existing page" if is_exist && page_id.nil?
 
         lock_id = page_lock_response_data["lock_id"]

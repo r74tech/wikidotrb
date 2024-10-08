@@ -66,13 +66,11 @@ RSpec.describe Wikidotrb::Module::Page do
       it "既存のページを編集できること" do
         # ページが存在するか確認し、存在しない場合は作成
         page = site.page.get(@test_page_name, raise_when_not_found: false)
-        unless page
-          page = site.page.create(
-            fullname: @test_page_name,
-            title: test_page_title,
-            source: test_page_source
-          )
-        end
+        page ||= site.page.create(
+          fullname: @test_page_name,
+          title: test_page_title,
+          source: test_page_source
+        )
 
         # ページを編集
         new_source = "This is the updated content of the page."
@@ -83,7 +81,6 @@ RSpec.describe Wikidotrb::Module::Page do
         expect(updated_page.source.wiki_text).to eq(new_source)
       end
     end
-
 
     context "Searching for pages" do
       it "指定したクエリに基づいてページを検索できること" do
