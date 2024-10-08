@@ -87,7 +87,7 @@ RSpec.describe Wikidotrb::Module::Page do
 
       # ページを編集
       new_source = "This is the updated content of the page."
-      page.edit(source: new_source, comment: "Updating the test page")
+      page.edit(source: new_source, comment: "Updating the test page", force_edit: true)
 
       # 編集が正しく反映されているか確認
       updated_page = site.page.get(@test_page_name)
