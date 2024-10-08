@@ -89,7 +89,15 @@ module Wikidotrb
 
         def self.gravatar_avatar?(elem)
           avatar_elem = elem.at_css("img")
-          avatar_elem && avatar_elem["src"].include?("gravatar.com")
+          return false unless avatar_elem
+
+          begin
+            avatar_url = avatar_elem["src"]
+            host = URI.parse(avatar_url).host
+            host == "gravatar.com"
+          rescue URI::InvalidURIError
+            false
+          end
         end
 
         # Check if the input is specifically the string "(user deleted)"
