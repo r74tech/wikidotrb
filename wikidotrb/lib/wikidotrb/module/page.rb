@@ -567,9 +567,17 @@ module Wikidotrb
           )
         end
 
-        # Confirming page creation
-        res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
-        raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
+        retries = 3
+        begin
+          res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
+          raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
+        rescue Wikidotrb::Common::Exceptions::NotFoundException => e
+          retries -= 1
+          raise e unless retries.positive?
+
+          sleep @site.config.retry_interval
+          retry
+        end
 
         res[0]
       end

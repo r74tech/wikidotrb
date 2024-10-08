@@ -13,5 +13,5 @@ gem "base64"
 gem "mutex_m"
 
 group :test do
-  gem 'rspec_junit_formatter'
+  gem "rspec_junit_formatter"
 end

@@ -61,12 +61,10 @@ RSpec.describe Wikidotrb::Module::Page do
             force_edit: true
           )
         rescue Wikidotrb::Common::Exceptions::TargetErrorException => e
-          if e.message.include?("locked")
-            sleep(1)
-            retry
-          else
-            raise e
-          end
+          raise e unless e.message.include?("locked")
+
+          sleep(1)
+          retry
         end
         expect(page.fullname).to eq(@test_page_name)
         expect(page.title).to eq(test_page_title)
@@ -84,16 +82,15 @@ RSpec.describe Wikidotrb::Module::Page do
           force_edit: true
         )
 
-      # ページを編集
-      new_source = "This is the updated content of the page."
-      page.edit(source: new_source, comment: "Updating the test page", force_edit: true)
+        # ページを編集
+        new_source = "This is the updated content of the page."
+        page.edit(source: new_source, comment: "Updating the test page", force_edit: true)
 
-      # 編集が正しく反映されているか確認
-      updated_page = site.page.get(@test_page_name)
-      expect(updated_page.source.wiki_text).to eq(new_source)
+        # 編集が正しく反映されているか確認
+        updated_page = site.page.get(@test_page_name)
+        expect(updated_page.source.wiki_text).to eq(new_source)
+      end
     end
-  end
-
 
     context "Searching for pages" do
       it "search" do
