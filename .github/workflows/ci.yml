@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: test-group
+      cancel-in-progress: true
     name: Ruby ${{ matrix.ruby }}
     strategy:
       matrix:
@@ -44,17 +47,9 @@ jobs:
       working-directory: wikidotrb
       continue-on-error: true
 
-    - name: Generate test coverage
-      run: |
-        bundle exec rspec --format progress
-        bundle exec simplecov
-      working-directory: wikidotrb
-      continue-on-error: true
-
     - name: Upload coverage and logs as artifacts
       uses: actions/upload-artifact@v3
       with:
         name: logs-and-coverage
         path: |
           wikidotrb/logs
-          wikidotrb/coverage
