@@ -524,15 +524,20 @@ module Wikidotrb
         }
         page_lock_request_body[:force_lock] = "yes" if force_edit
 
-        # `site.amc_request` returns a Hash, no need to call `.json`
+        # Requesting page lock
         page_lock_response_data = site.amc_request(bodies: [page_lock_request_body])[0]
 
-        raise Wikidotrb::Common::Exceptions::TargetErrorException, "Page #{fullname} is locked or other locks exist" if page_lock_response_data["locked"] || page_lock_response_data["other_locks"]
+        # Handling page lock errors
+        if page_lock_response_data.nil? || page_lock_response_data["locked"] || page_lock_response_data["other_locks"]
+          raise Wikidotrb::Common::Exceptions::TargetErrorException, "Page #{fullname} is locked or other locks exist"
+        end
 
         is_exist = page_lock_response_data.key?("page_revision_id")
-
-        raise Wikidotrb::Common::Exceptions::TargetExistsException, "Page #{fullname} already exists" if raise_on_exists && is_exist
-
+        
+        if raise_on_exists && is_exist
+          raise Wikidotrb::Common::Exceptions::TargetExistsException, "Page #{fullname} already exists"
+        end
+        
         raise ArgumentError, "page_id must be specified when editing existing page" if is_exist && page_id.nil?
 
         lock_id = page_lock_response_data["lock_id"]
@@ -553,22 +558,18 @@ module Wikidotrb
           source: source,
           comments: comment
         }
+
         response_data = site.amc_request(bodies: [edit_request_body])[0]
 
         unless response_data && response_data["status"] == "ok"
-          if response_data.nil?
-            raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
-              "Failed to create or edit page: #{fullname}",
-              "no_response"
-            )
-          else
-            raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
-              "Failed to create or edit page: #{fullname}",
-              response_data["status"]
-            )
-          end
+          error_status = response_data.nil? ? "no_response" : response_data["status"]
+          raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+            "Failed to create or edit page: #{fullname}",
+            error_status
+          )
         end
 
+        # Confirming page creation
         res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
         raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
 
