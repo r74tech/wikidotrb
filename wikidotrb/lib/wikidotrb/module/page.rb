@@ -569,7 +569,7 @@ module Wikidotrb
           )
         end
 
-        res = PageCollection.search_pages(site: site, query: SearchPagesQuery.new(fullname: fullname))
+        res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
         puts "Search result: #{res.inspect}"
         raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
 
