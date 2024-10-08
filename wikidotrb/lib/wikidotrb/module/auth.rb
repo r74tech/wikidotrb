@@ -31,28 +31,34 @@ module Wikidotrb
           timeout: { operation: 20 }
         )
 
+        # エラーレスポンスの処理
+        if response.is_a?(HTTPX::ErrorResponse)
+          raise Wikidotrb::Common::Exceptions::SessionCreateException,
+                "Login attempt failed due to network error: #{response.error}"
+        end
+
         # ステータスコードのチェック
         unless response.status == 200
           raise Wikidotrb::Common::Exceptions::SessionCreateException,
-                "Login attempt is failed due to HTTP status code: #{response.status}"
+                "Login attempt failed due to HTTP status code: #{response.status}"
         end
 
         # レスポンスボディのチェック
         if response.body.to_s.include?("The login and password do not match")
           raise Wikidotrb::Common::Exceptions::SessionCreateException,
-                "Login attempt is failed due to invalid username or password"
+                "Login attempt failed due to invalid username or password"
         end
 
         # クッキーのチェックとパース
         set_cookie_header = response.headers["set-cookie"]
 
         # `set-cookie` が存在しない、または `nil` の場合にエラーを発生
-        raise Wikidotrb::Common::Exceptions::SessionCreateException, "Login attempt is failed due to invalid cookies" if set_cookie_header.nil? || set_cookie_header.empty?
+        raise Wikidotrb::Common::Exceptions::SessionCreateException, "Login attempt failed due to invalid cookies" if set_cookie_header.nil? || set_cookie_header.empty?
 
         # セッションクッキーを取得
         session_cookie = set_cookie_header.match(/WIKIDOT_SESSION_ID=([^;]+)/)
 
-        raise Wikidotrb::Common::Exceptions::SessionCreateException, "Login attempt is failed due to invalid cookies" unless session_cookie
+        raise Wikidotrb::Common::Exceptions::SessionCreateException, "Login attempt failed due to invalid cookies" unless session_cookie
 
         # セッションクッキーの設定
         client.amc_client.header.set_cookie("WIKIDOT_SESSION_ID", session_cookie[1])
