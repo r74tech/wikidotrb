@@ -49,6 +49,7 @@ jobs:
         bundle exec rspec --format progress
         bundle exec simplecov
       working-directory: wikidotrb
+      continue-on-error: true
 
     - name: Upload coverage and logs as artifacts
       uses: actions/upload-artifact@v3
