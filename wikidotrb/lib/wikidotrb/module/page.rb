@@ -569,12 +569,26 @@ module Wikidotrb
           )
         end
 
-        res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
-        puts "Search result: #{res.inspect}"
-        raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
+        retries = site.config.attempt_limit || 3
+        retry_interval = site.config.retry_interval || 5
+
+        begin
+          res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
+          puts "Search result: #{res.inspect}"
+          raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
+        rescue Wikidotrb::Common::Exceptions::NotFoundException => e
+          retries -= 1
+          if retries > 0
+            sleep retry_interval
+            retry
+          else
+            raise e
+          end
+        end
 
         res[0]
       end
+
 
       def edit(title: nil, source: nil, comment: nil, force_edit: false)
         title ||= @title
