@@ -554,7 +554,7 @@ module Wikidotrb
         }
         response_data = site.amc_request(bodies: [edit_request_body])[0]
 
-        unless response_data["status"] == "ok"
+        unless response_data && response_data["status"] == "ok"
           raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException,
                 "Failed to create or edit page: #{fullname}"
         end
