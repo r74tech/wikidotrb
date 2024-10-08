@@ -35,7 +35,7 @@ jobs:
         echo "  password: '${{ secrets.WIKIDOT_PASSWORD }}'" >> wikidotrb/config.yml
         echo "  site: '${{ secrets.WIKIDOT_SITE }}'" >> wikidotrb/config.yml
       shell: bash
-    
+
     - name: Run tests and collect logs
       run: |
         mkdir -p logs
