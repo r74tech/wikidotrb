@@ -35,8 +35,24 @@ jobs:
         echo "  password: '${{ secrets.WIKIDOT_PASSWORD }}'" >> wikidotrb/config.yml
         echo "  site: '${{ secrets.WIKIDOT_SITE }}'" >> wikidotrb/config.yml
       shell: bash
-
     
-    - name: Run the default task
-      run: bundle exec rake
+    - name: Run tests and collect logs
+      run: |
+        mkdir -p logs
+        bundle exec rspec --format RspecJunitFormatter --out logs/rspec.xml --format progress
+        bundle exec rspec --format documentation
       working-directory: wikidotrb
+
+    - name: Generate test coverage
+      run: |
+        bundle exec rspec --format progress
+        bundle exec simplecov
+      working-directory: wikidotrb
+
+    - name: Upload coverage and logs as artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs-and-coverage
+        path: |
+          wikidotrb/logs
+          wikidotrb/coverage
