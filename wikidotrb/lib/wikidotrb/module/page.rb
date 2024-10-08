@@ -575,7 +575,7 @@ module Wikidotrb
           retries -= 1
           raise e unless retries.positive?
 
-          sleep @site.config.retry_interval
+          sleep 1
           retry
         end
 
