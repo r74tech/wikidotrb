@@ -51,7 +51,7 @@ RSpec.describe Wikidotrb::Module::Page do
     end
 
     context "Creating a page" do
-      it "新しいページを作成できる_create" do
+      it "create" do
         page = nil
         begin
           page = site.page.create(
@@ -75,7 +75,7 @@ RSpec.describe Wikidotrb::Module::Page do
     end
 
     context "Editing a page" do
-      it "既存のページを編集できる_edit" do
+      it "edit" do
         page = site.page.get(@test_page_name, raise_when_not_found: false)
         page ||= site.page.create(
           fullname: @test_page_name,
@@ -96,7 +96,7 @@ RSpec.describe Wikidotrb::Module::Page do
 
 
     context "Searching for pages" do
-      it "指定したクエリに基づいてページを検索できる_search" do
+      it "search" do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
@@ -114,7 +114,7 @@ RSpec.describe Wikidotrb::Module::Page do
     end
 
     context "Deleting a page" do
-      it "既存のページを削除できる_delete" do
+      it "delete" do
         site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
