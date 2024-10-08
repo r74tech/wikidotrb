@@ -569,8 +569,8 @@ module Wikidotrb
           )
         end
 
-        retries = site.config.attempt_limit || 3
-        retry_interval = site.config.retry_interval || 5
+        retries = 3
+        retry_interval = 5
 
         begin
           res = PageCollection.search_pages(site, SearchPagesQuery.new(fullname: fullname))
