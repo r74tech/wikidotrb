@@ -28,7 +28,7 @@ module Wikidotrb
 
           # 存在チェック
           if html.at_css("div.error-block")
-            raise NotFoundException, "User not found: #{response.uri}" if raise_when_not_found
+            raise Wikidotrb::Common::Exceptions::NotFoundException, "User not found: #{response.uri}" if raise_when_not_found
 
             next
           end

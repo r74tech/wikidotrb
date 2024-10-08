@@ -29,13 +29,15 @@ module Wikidotrb
         messages = []
 
         responses.each_with_index do |response, index|
-          if response.is_a?(Wikidotrb::Common::Exceptions::WikidotStatusCodeException) && response.status_code == ("no_message")
+          if response.is_a?(Wikidotrb::Common::Exceptions::WikidotStatusCodeException) && response.status_code == "no_message"
             raise Wikidotrb::Common::Exceptions::ForbiddenException.new(
               "Failed to get message: #{message_ids[index]}"
             ), response
           end
 
           raise response if response.is_a?(Exception)
+
+          next unless response && response["body"]
 
           html = Nokogiri::HTML(response["body"])
           sender, recipient = html.css("div.pmessage div.header span.printuser")
@@ -56,7 +58,7 @@ module Wikidotrb
       def self._acquire(client:, module_name:)
         response = client.amc_client.request(bodies: [{ moduleName: module_name }])[0]
 
-        html = Nokogiri::HTML(response["body"])
+        html = Nokogiri::HTML(response["body"]) if response && response["body"]
         pager = html.css("div.pager span.target")
         max_page = pager.length > 2 ? pager[-2].text.to_i : 1
 
@@ -69,7 +71,7 @@ module Wikidotrb
 
         message_ids = []
         responses.each do |res|
-          html = Nokogiri::HTML(res["body"])
+          html = Nokogiri::HTML(res["body"]) if res && res["body"]
           message_ids += html.css("tr.message").map { |tr| tr["data-href"].split("/").last.to_i }
         end
 

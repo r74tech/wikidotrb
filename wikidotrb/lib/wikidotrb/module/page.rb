@@ -450,7 +450,7 @@ module Wikidotrb
           return revision if revision.rev_no == @revisions_count
         end
 
-        raise NotFoundException, "Cannot find latest revision"
+        raise Wikidotrb::Common::Exceptions::NotFoundException, "Cannot find latest revision"
       end
 
       def votes
@@ -555,12 +555,12 @@ module Wikidotrb
         response_data = site.amc_request(bodies: [edit_request_body])[0]
 
         unless response_data["status"] == "ok"
-          raise WikidotStatusCodeException,
+          raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException,
                 "Failed to create or edit page: #{fullname}"
         end
 
         res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
-        raise NotFoundException, "Page creation failed: #{fullname}" if res.empty?
+        raise Wikidotrb::Common::Exceptions::NotFoundException, "Page creation failed: #{fullname}" if res.empty?
 
         res[0]
       end

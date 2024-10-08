@@ -92,7 +92,7 @@ module Wikidotrb
         https_url = "https://#{site_name}.wikidot.com"
 
         http_response = HTTPX.get(http_url)
-        raise NotFoundException, "Site is not found: #{site_name}.wikidot.com" if http_response.status == 404
+        raise Wikidotrb::Common::Exceptions::NotFoundException, "Site is not found: #{site_name}.wikidot.com" if http_response.status == 404
 
         https_response = HTTPX.get(https_url)
         https_response.status == 200 || (https_response.status == 301 && https_response.headers["location"].start_with?("https"))
