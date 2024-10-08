@@ -28,14 +28,22 @@ RSpec.describe Wikidotrb::Module::Page do
       expect(site).not_to be_nil
 
       # Ensure the page does not exist before each test
-      existing_page = site.page.get(@test_page_name, raise_when_not_found: false)
-      existing_page&.destroy
+      begin
+        existing_page = site.page.get(@test_page_name)
+        existing_page&.destroy
+      rescue Wikidotrb::Common::Exceptions::NotFoundException
+        # ページが存在しない場合は無視
+      end
     end
 
     after(:each) do
       # Ensure cleanup after each test
-      page = site.page.get(@test_page_name, raise_when_not_found: false)
-      page&.destroy
+      begin
+        page = site.page.get(@test_page_name)
+        page&.destroy
+      rescue Wikidotrb::Common::Exceptions::NotFoundException
+        # ページが存在しない場合は無視
+      end
 
       # 各テストケース終了後にクライアントをログアウト
       client.finalize if client.is_logged_in

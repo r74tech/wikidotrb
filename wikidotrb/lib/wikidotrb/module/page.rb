@@ -245,10 +245,11 @@ module Wikidotrb
         responses.each_with_index do |response, index|
           source = response.body.to_s # Convert to string if necessary
 
-          id_match = source.match(/WIKIREQUEST\.info\.pageId = (\d+);/)
+          id_match = source&.match(/WIKIREQUEST\.info\.pageId = (\d+);/)
+
           unless id_match
             raise Wikidotrb::Common::Exceptions::UnexpectedException,
-                  "Cannot find page id: #{target_pages[index].fullname}"
+                  "Cannot find page id: #{target_pages[index].fullname}, response: #{source || 'nil'}"
           end
 
           target_pages[index].id = id_match[1].to_i
@@ -555,10 +556,17 @@ module Wikidotrb
         response_data = site.amc_request(bodies: [edit_request_body])[0]
 
         unless response_data && response_data["status"] == "ok"
-          raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
-            "Failed to create or edit page: #{fullname}",
-            response_data["status"]
-          )
+          if response_data.nil?
+            raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+              "Failed to create or edit page: #{fullname}",
+              "no_response"
+            )
+          else
+            raise Wikidotrb::Common::Exceptions::WikidotStatusCodeException.new(
+              "Failed to create or edit page: #{fullname}",
+              response_data["status"]
+            )
+          end
         end
 
         res = PageCollection.search_pages(site, Wikidotrb::Module::SearchPagesQuery.new(fullname: fullname))
