@@ -249,7 +249,7 @@ module Wikidotrb
 
           unless id_match
             raise Wikidotrb::Common::Exceptions::UnexpectedException,
-                  "Cannot find page id: #{target_pages[index].fullname}, response: #{source || 'nil'}"
+                  "Cannot find page id for: #{target_pages[index].fullname}, possibly an invalid response"
           end
 
           target_pages[index].id = id_match[1].to_i
