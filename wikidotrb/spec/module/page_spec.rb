@@ -49,38 +49,50 @@ RSpec.describe Wikidotrb::Module::Page do
       client.finalize if client.is_logged_in
     end
 
-    context "Creating a page" do
-      it "新しいページを作成できること" do
+  context "Creating a page" do
+    it "新しいページを作成できること" do
+      # ページ作成時にロックがかかっている場合の対応
+      page = nil
+      begin
         page = site.page.create(
           fullname: @test_page_name,
           title: test_page_title,
           source: test_page_source
         )
-        expect(page.fullname).to eq(@test_page_name)
-        expect(page.title).to eq(test_page_title)
-        expect(page.source.wiki_text).to eq(test_page_source)
+      rescue Wikidotrb::Common::Exceptions::TargetErrorException => e
+        if e.message.include?("locked")
+          sleep(1)
+          retry
+        else
+          raise e
+        end
       end
+      expect(page.fullname).to eq(@test_page_name)
+      expect(page.title).to eq(test_page_title)
+      expect(page.source.wiki_text).to eq(test_page_source)
     end
+  end
 
-    context "Editing a page" do
-      it "既存のページを編集できること" do
-        # ページが存在するか確認し、存在しない場合は作成
-        page = site.page.get(@test_page_name, raise_when_not_found: false)
-        page ||= site.page.create(
-          fullname: @test_page_name,
-          title: test_page_title,
-          source: test_page_source
-        )
+  context "Editing a page" do
+    it "既存のページを編集できること" do
+      # 既存のページがある場合はスキップ、または再試行
+      page = site.page.get(@test_page_name, raise_when_not_found: false)
+      page ||= site.page.create(
+        fullname: @test_page_name,
+        title: test_page_title,
+        source: test_page_source
+      )
 
-        # ページを編集
-        new_source = "This is the updated content of the page."
-        page.edit(source: new_source, comment: "Updating the test page")
+      # ページを編集
+      new_source = "This is the updated content of the page."
+      page.edit(source: new_source, comment: "Updating the test page")
 
-        # 編集が正しく反映されているか確認
-        updated_page = site.page.get(@test_page_name)
-        expect(updated_page.source.wiki_text).to eq(new_source)
-      end
+      # 編集が正しく反映されているか確認
+      updated_page = site.page.get(@test_page_name)
+      expect(updated_page.source.wiki_text).to eq(new_source)
     end
+  end
+
 
     context "Searching for pages" do
       it "指定したクエリに基づいてページを検索できること" do
