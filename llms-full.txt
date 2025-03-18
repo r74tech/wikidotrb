@@ -3,7 +3,7 @@
 This document provides detailed information about the Wikidotrb API, a Ruby library for interacting with Wikidot sites.
 
 # Wikidotrb
-Source: /api/yard/Wikidotrb.html
+Source: /Wikidotrb.html
 
 No documentation available.
 
@@ -11,7 +11,7 @@ No methods found.
 
 
 # Wikidotrb::Module
-Source: /api/yard/Wikidotrb/Module.html
+Source: /Wikidotrb/Module.html
 
 No documentation available.
 
@@ -19,7 +19,7 @@ No methods found.
 
 
 # Wikidotrb::Module::Client
-Source: /api/yard/Wikidotrb/Module/Client.html
+Source: /Wikidotrb/Module/Client.html
 
 No documentation available.
 
@@ -43,7 +43,7 @@ No documentation available.
 
 
 # Wikidotrb::Module::Forum
-Source: /api/yard/Wikidotrb/Module/Forum.html
+Source: /Wikidotrb/Module/Forum.html
 
 No documentation available.
 
@@ -67,7 +67,7 @@ Initialization method
 
 
 # Wikidotrb::Module::Page
-Source: /api/yard/Wikidotrb/Module/Page.html
+Source: /Wikidotrb/Module/Page.html
 
 No documentation available.
 
@@ -163,7 +163,7 @@ No documentation available.
 
 
 # Wikidotrb::Module::Site
-Source: /api/yard/Wikidotrb/Module/Site.html
+Source: /Wikidotrb/Module/Site.html
 
 No documentation available.
 
@@ -203,7 +203,7 @@ No documentation available.
 
 
 # Wikidotrb::Module::User
-Source: /api/yard/Wikidotrb/Module/User.html
+Source: /Wikidotrb/Module/User.html
 
 Regular user object
 
