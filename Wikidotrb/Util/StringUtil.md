@@ -18,17 +18,17 @@ has_children: true
 
 <div class="method-signature">to_unix(target_str)</div>
 
-Unix形式に文字列を変換する
+Converts a string to Unix-style format
 
 **Parameters:**
 
 <div class="method-parameters">
-* <span class="parameter-name">target_str</span> — 変換対象の文字列
+* <span class="parameter-name">target_str</span> — The string to be converted
 </div>
 
 **Returns:**
 
-変換された文字列
+The converted string
 
 ---
 

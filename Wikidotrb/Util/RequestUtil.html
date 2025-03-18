@@ -131,7 +131,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>GETリクエストを送信する.</p>
+    <span class="summary_desc"><div class='inline'><p>Sends HTTP requests to multiple URLs concurrently.</p>
 </div></span>
   
 </li>
@@ -157,7 +157,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>GETリクエストを送信する</p>
+    <p>Sends HTTP requests to multiple URLs concurrently</p>
 
 
   </div>
@@ -176,7 +176,7 @@
       
       
         &mdash;
-        <div class='inline'><p>クライアント</p>
+        <div class='inline'><p>The client instance</p>
 </div>
       
     </li>
@@ -191,7 +191,7 @@
       
       
         &mdash;
-        <div class='inline'><p>リクエストメソッド</p>
+        <div class='inline'><p>HTTP request method (&quot;GET&quot; or &quot;POST&quot;)</p>
 </div>
       
     </li>
@@ -206,7 +206,7 @@
       
       
         &mdash;
-        <div class='inline'><p>URLのリスト</p>
+        <div class='inline'><p>List of URLs to request</p>
 </div>
       
     </li>
@@ -223,7 +223,7 @@
       
       
         &mdash;
-        <div class='inline'><p>例外を返すかどうか</p>
+        <div class='inline'><p>Whether to return exceptions instead of raising them</p>
 </div>
       
     </li>
@@ -241,7 +241,7 @@
       
       
         &mdash;
-        <div class='inline'><p>レスポンスのリスト</p>
+        <div class='inline'><p>List of responses or exceptions</p>
 </div>
       
     </li>
@@ -296,7 +296,7 @@
   <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_amc_client'>amc_client</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span>
   <span class='id identifier rubyid_semaphore'>semaphore</span> <span class='op'>=</span> <span class='const'>Concurrent</span><span class='op'>::</span><span class='const'>Semaphore</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_config'>config</span><span class='period'>.</span><span class='id identifier rubyid_semaphore_limit'>semaphore_limit</span><span class='rparen'>)</span>
 
-  <span class='comment'># リクエスト処理を行う非同期タスク
+  <span class='comment'># Create asynchronous tasks for each request
 </span>  <span class='id identifier rubyid_tasks'>tasks</span> <span class='op'>=</span> <span class='id identifier rubyid_urls'>urls</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_url'>url</span><span class='op'>|</span>
     <span class='const'>Concurrent</span><span class='op'>::</span><span class='const'>Promises</span><span class='period'>.</span><span class='id identifier rubyid_future'>future</span> <span class='kw'>do</span>
       <span class='id identifier rubyid_semaphore'>semaphore</span><span class='period'>.</span><span class='id identifier rubyid_acquire'>acquire</span>
@@ -320,10 +320,10 @@
     <span class='kw'>end</span>
   <span class='kw'>end</span>
 
-  <span class='comment'># 全てのタスクの完了を待機
+  <span class='comment'># Wait for all tasks to complete
 </span>  <span class='id identifier rubyid_results'>results</span> <span class='op'>=</span> <span class='const'>Concurrent</span><span class='op'>::</span><span class='const'>Promises</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_tasks'>tasks</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_value!'>value!</span>
 
-  <span class='comment'># 例外を返すかどうかのオプションに応じて結果を返す
+  <span class='comment'># Return results based on return_exceptions option
 </span>  <span class='id identifier rubyid_return_exceptions'>return_exceptions</span> <span class='op'>?</span> <span class='id identifier rubyid_results'>results</span> <span class='op'>:</span> <span class='id identifier rubyid_results'>results</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_r'>r</span><span class='op'>|</span> <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_r'>r</span> <span class='kw'>if</span> <span class='id identifier rubyid_r'>r</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Exception</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -336,7 +336,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 18 04:11:55 2025 by
+  Generated on Tue Mar 18 04:26:37 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.2.7).
 </div>

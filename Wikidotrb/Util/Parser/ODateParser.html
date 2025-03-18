@@ -131,7 +131,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>odate要素を解析し、Timeオブジェクトを返す.</p>
+    <span class="summary_desc"><div class='inline'><p>Parses an odate element and returns a Time object.</p>
 </div></span>
   
 </li>
@@ -157,7 +157,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>odate要素を解析し、Timeオブジェクトを返す</p>
+    <p>Parses an odate element and returns a Time object</p>
 
 
   </div>
@@ -176,7 +176,7 @@
       
       
         &mdash;
-        <div class='inline'><p>odate要素</p>
+        <div class='inline'><p>The odate element</p>
 </div>
       
     </li>
@@ -194,7 +194,7 @@
       
       
         &mdash;
-        <div class='inline'><p>odate要素が表す日時</p>
+        <div class='inline'><p>The time represented by the odate element</p>
 </div>
       
     </li>
@@ -211,7 +211,7 @@
       
       
         &mdash;
-        <div class='inline'><p>odate要素が有効なunix timeを含んでいない場合</p>
+        <div class='inline'><p>If the odate element does not contain a valid unix time</p>
 </div>
       
     </li>
@@ -259,25 +259,25 @@
       <pre class="code"><span class="info file"># File 'lib/wikidotrb/util/parser/odate.rb', line 14</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_odate_element'>odate_element</span><span class='rparen'>)</span>
-  <span class='comment'># odate_elementがNokogiri::XML::Elementでない場合はその内容をパースする
+  <span class='comment'># Parse the content if odate_element is not a Nokogiri::XML::Element
 </span>  <span class='id identifier rubyid_odate_element'>odate_element</span> <span class='op'>=</span> <span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>HTML</span><span class='lparen'>(</span><span class='id identifier rubyid_odate_element'>odate_element</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_at_css'>at_css</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.odate</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_odate_element'>odate_element</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>XML</span><span class='op'>::</span><span class='const'>Element</span><span class='rparen'>)</span>
 
-  <span class='comment'># 要素がnilの場合やclass属性がない場合はエラー
+  <span class='comment'># Raise error if element is nil or has no class attribute
 </span>  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>odate element does not contain a valid unix time</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_odate_element'>odate_element</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_odate_element'>odate_element</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>class</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
-  <span class='comment'># クラス属性を取得して処理
+  <span class='comment'># Get and process class attribute
 </span>  <span class='id identifier rubyid_odate_classes'>odate_classes</span> <span class='op'>=</span> <span class='id identifier rubyid_odate_element'>odate_element</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>class</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span>
 
-  <span class='comment'># &quot;time_&quot;が含まれるクラスを検索
+  <span class='comment'># Search for class containing &quot;time_&quot;
 </span>  <span class='id identifier rubyid_odate_classes'>odate_classes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_odate_class'>odate_class</span><span class='op'>|</span>
-    <span class='comment'># &quot;time_&quot;が含まれるクラスを検索
+    <span class='comment'># Skip if class doesn&#39;t start with &quot;time_&quot;
 </span>    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_odate_class'>odate_class</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 
     <span class='id identifier rubyid_unix_time_str'>unix_time_str</span> <span class='op'>=</span> <span class='id identifier rubyid_odate_class'>odate_class</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time_</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
     <span class='id identifier rubyid_unix_time'>unix_time</span> <span class='op'>=</span> <span class='id identifier rubyid_unix_time_str'>unix_time_str</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
 
-    <span class='comment'># unix timeが有効な範囲内か確認
-</span>    <span class='comment'># Wikidotは-8640000000000から8640000000000までの範囲をサポート
+    <span class='comment'># Check if unix time is within valid range
+</span>    <span class='comment'># Wikidot supports range from -8640000000000 to 8640000000000
 </span>    <span class='id identifier rubyid_min_unix_time'>min_unix_time</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>8_640_000_000_000</span>
     <span class='id identifier rubyid_max_unix_time'>max_unix_time</span> <span class='op'>=</span> <span class='int'>8_640_000_000_000</span>
     <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../Wikidotrb.html" title="Wikidotrb (module)">Wikidotrb</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Common.html" title="Wikidotrb::Common (module)">Common</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Common/Exceptions.html" title="Wikidotrb::Common::Exceptions (module)">Exceptions</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Common/Exceptions/UnexpectedException.html" title="Wikidotrb::Common::Exceptions::UnexpectedException (class)">UnexpectedException</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Invalid unix time</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_unix_time'>unix_time</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_min_unix_time'>min_unix_time</span> <span class='op'>||</span> <span class='id identifier rubyid_unix_time'>unix_time</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_max_unix_time'>max_unix_time</span>
@@ -285,7 +285,7 @@
     <span class='kw'>return</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_at'>at</span><span class='lparen'>(</span><span class='id identifier rubyid_unix_time'>unix_time</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
-  <span class='comment'># &quot;time_&quot;を含むクラスが見つからなかった場合はエラーを発生させる
+  <span class='comment'># Raise error if no class containing &quot;time_&quot; was found
 </span>  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>odate element does not contain a valid unix time</span><span class='tstring_end'>&quot;</span></span>
 <span class='kw'>end</span></pre>
     </td>
@@ -298,7 +298,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 18 04:11:55 2025 by
+  Generated on Tue Mar 18 04:26:37 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.2.7).
 </div>

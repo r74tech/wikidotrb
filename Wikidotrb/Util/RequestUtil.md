@@ -18,7 +18,7 @@ has_children: true
 
 <div class="method-signature">request(client:, method:, urls:, return_exceptions: false)</div>
 
-GETリクエストを送信する
+Sends HTTP requests to multiple URLs concurrently
 
 **Parameters:**
 
@@ -31,7 +31,7 @@ GETリクエストを送信する
 
 **Returns:**
 
-レスポンスのリスト
+List of responses or exceptions
 
 ---
 

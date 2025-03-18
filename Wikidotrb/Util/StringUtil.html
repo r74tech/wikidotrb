@@ -131,7 +131,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Unix形式に文字列を変換する.</p>
+    <span class="summary_desc"><div class='inline'><p>Converts a string to Unix-style format.</p>
 </div></span>
   
 </li>
@@ -157,7 +157,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Unix形式に文字列を変換する</p>
+    <p>Converts a string to Unix-style format</p>
 
 
   </div>
@@ -176,7 +176,7 @@
       
       
         &mdash;
-        <div class='inline'><p>変換対象の文字列</p>
+        <div class='inline'><p>The string to be converted</p>
 </div>
       
     </li>
@@ -194,7 +194,7 @@
       
       
         &mdash;
-        <div class='inline'><p>変換された文字列</p>
+        <div class='inline'><p>The converted string</p>
 </div>
       
     </li>
@@ -238,16 +238,16 @@
       <pre class="code"><span class="info file"># File 'lib/wikidotrb/util/stringutil.rb', line 11</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_to_unix'>to_unix</span><span class='lparen'>(</span><span class='id identifier rubyid_target_str'>target_str</span><span class='rparen'>)</span>
-  <span class='comment'># MEMO: legacy wikidotの実装に合わせている
+  <span class='comment'># NOTE: This implementation matches the legacy wikidot behavior
 </span>
-  <span class='comment'># 特殊文字の変換を行う
+  <span class='comment'># Convert special characters
 </span>  <span class='id identifier rubyid_special_char_map'>special_char_map</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Wikidotrb.html" title="Wikidotrb (module)">Wikidotrb</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Table.html" title="Wikidotrb::Table (module)">Table</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Table/CharTable.html" title="Wikidotrb::Table::CharTable (module)">CharTable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Table/CharTable.html#SPECIAL_CHAR_MAP-constant" title="Wikidotrb::Table::CharTable::SPECIAL_CHAR_MAP (constant)">SPECIAL_CHAR_MAP</a></span></span>
   <span class='id identifier rubyid_target_str'>target_str</span> <span class='op'>=</span> <span class='id identifier rubyid_target_str'>target_str</span><span class='period'>.</span><span class='id identifier rubyid_chars'>chars</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_char'>char</span><span class='op'>|</span> <span class='id identifier rubyid_special_char_map'>special_char_map</span><span class='lbracket'>[</span><span class='id identifier rubyid_char'>char</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_char'>char</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
 
-  <span class='comment'># lowercaseへの変換
+  <span class='comment'># Convert to lowercase
 </span>  <span class='id identifier rubyid_target_str'>target_str</span> <span class='op'>=</span> <span class='id identifier rubyid_target_str'>target_str</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
 
-  <span class='comment'># ASCII以外の文字を削除し、特殊なケースを正規表現で置き換え
+  <span class='comment'># Remove non-ASCII characters and replace special cases with regex
 </span>  <span class='id identifier rubyid_target_str'>target_str</span> <span class='op'>=</span> <span class='id identifier rubyid_target_str'>target_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>[^a-z0-9\-:_]</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
                          <span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>:_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
                          <span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>(?&lt;!:)_</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -260,7 +260,7 @@
                          <span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_-</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
                          <span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-_</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 
-  <span class='comment'># 先頭と末尾の&#39;:&#39;を削除
+  <span class='comment'># Remove &#39;:&#39; from the beginning and end of the string
 </span>  <span class='id identifier rubyid_target_str'>target_str</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^:</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>:$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -273,7 +273,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 18 04:11:54 2025 by
+  Generated on Tue Mar 18 04:26:37 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.2.7).
 </div>
