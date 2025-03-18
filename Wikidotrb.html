@@ -85,7 +85,58 @@
   
 </div>
 
-<h2>Defined Under Namespace</h2>
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Wikidotrb - Ruby library for interacting with Wikidot sites</p>
+
+<p>This library provides a set of tools to interact with Wikidot sites through their
+AJAX Module Connector (AMC) interface. It allows for tasks such as:</p>
+
+<ul>
+<li>Logging in and managing authentication</li>
+<li>Reading and editing pages</li>
+<li>Managing forum discussions</li>
+<li>Working with user accounts</li>
+<li>Interacting with site settings</li>
+</ul>
+
+<p>For getting started, see <span class='object_link'><a href="Wikidotrb/Module/Client.html" title="Wikidotrb::Module::Client (class)">Module::Client</a></span> which is the main entry point.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage with authentication</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='const'>Wikidotrb</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Wikidotrb/Module.html" title="Wikidotrb::Module (module)">Module</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Wikidotrb/Module/Client.html" title="Wikidotrb::Module::Client (class)">Client</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Wikidotrb/Module/Client.html#initialize-instance_method" title="Wikidotrb::Module::Client#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>username:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>your_username</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>password:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>your_password</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_site'>site</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_site'>site</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>your-site</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_pages'>pages</span> <span class='op'>=</span> <span class='id identifier rubyid_site'>site</span><span class='period'>.</span><span class='id identifier rubyid_pages'>pages</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>The Wikidotrb Contributors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><h2>Defined Under Namespace</h2>
 <p class="children">
   
     
@@ -125,7 +176,7 @@
 </div>
 
       <div id="footer">
-  Generated on Tue Mar 18 03:39:10 2025 by
+  Generated on Tue Mar 18 03:49:37 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.2.7).
 </div>
