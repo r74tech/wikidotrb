@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  File: wikidotrb
-  
-    &mdash; Wikidotrb Documentation
+  Wikidotrb Documentation
   
 </title>
 
@@ -15,7 +13,7 @@
   <link rel="stylesheet" href="css/common.css" type="text/css" />
 
 <script type="text/javascript">
-  pathId = "wikidotrb";
+  pathId = null;
   relpath = '';
 </script>
 
@@ -36,9 +34,6 @@
       <div id="header">
         <div id="menu">
   
-    <a href="index.html">Index</a> &raquo; 
-    <span class="title">File: wikidotrb</span>
-  
 </div>
 
         <div id="search">
@@ -57,69 +52,695 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'><pre class="code ruby"><span class='comment'># frozen_string_literal: true
-</span>
-<span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/version</span><span class='tstring_end'>&quot;</span></span>
+      <div id="content"><h1 class="noborder title">Wikidotrb Documentation</h1>
+<div id="listing">
+  <h1 class="alphaindex">Alphabetic Index</h1>
+  
+  <h2>File Listing</h2>
+  <ul id="files" class="index_inline_list">
+  
+  
+    <li class="r1"><a href="index.html" title="wikidotrb">wikidotrb</a></li>
+    
+  
+    <li class="r2"><a href="file.CHANGELOG.html" title="CHANGELOG">CHANGELOG</a></li>
+    
+  
+  </ul>
 
-<span class='comment'># Wikidotrb - Ruby library for interacting with Wikidot sites
-</span><span class='comment'>#
-</span><span class='comment'># This library provides a set of tools to interact with Wikidot sites through their
-</span><span class='comment'># AJAX Module Connector (AMC) interface. It allows for tasks such as:
-</span><span class='comment'>#
-</span><span class='comment'># * Logging in and managing authentication
-</span><span class='comment'># * Reading and editing pages
-</span><span class='comment'># * Managing forum discussions
-</span><span class='comment'># * Working with user accounts
-</span><span class='comment'># * Interacting with site settings
-</span><span class='comment'>#
-</span><span class='comment'># For getting started, see {Wikidotrb::Module::Client} which is the main entry point.
-</span><span class='comment'>#
-</span><span class='comment'># @example Basic usage with authentication
-</span><span class='comment'>#   client = Wikidotrb::Module::Client.new(username: &quot;your_username&quot;, password: &quot;your_password&quot;)
-</span><span class='comment'>#   site = client.site.get(&quot;your-site&quot;)
-</span><span class='comment'>#   pages = site.pages
-</span><span class='comment'>#
-</span><span class='comment'># @author The Wikidotrb Contributors
-</span><span class='kw'>module</span> <span class='const'><span class='object_link'><a href="Wikidotrb.html" title="Wikidotrb (module)">Wikidotrb</a></span></span>
-  <span class='kw'>class</span> <span class='const'>Error</span> <span class='op'>&lt;</span> <span class='const'>StandardError</span><span class='semicolon'>;</span> <span class='kw'>end</span>
+<div class="clear"></div>
+<h2>Namespace Listing A-Z</h2>
 
-  <span class='comment'># Require core components
-</span>  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/common/decorators</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/common/exceptions</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/common/logger</span><span class='tstring_end'>&quot;</span></span>
 
-  <span class='comment'># Require connector components
-</span>  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/connector/ajax</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/connector/api</span><span class='tstring_end'>&quot;</span></span>
 
-  <span class='comment'># Require modules
-</span>  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/auth</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/client</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/forum</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/forum_category</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/forum_group</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/forum_post</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/forum_thread</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/page</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/page_revision</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/page_source</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/page_votes</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/private_message</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/site</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/site_application</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/module/user</span><span class='tstring_end'>&quot;</span></span>
 
-  <span class='comment'># Require utilities
-</span>  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/parser/odate</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/parser/user</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/quick_module</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/requestutil</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/stringutil</span><span class='tstring_end'>&quot;</span></span>
-  <span class='id identifier rubyid_require_relative'>require_relative</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>wikidotrb/util/table/char_table</span><span class='tstring_end'>&quot;</span></span>
-<span class='kw'>end</span></pre></div></div>
+<table>
+  <tr>
+    <td valign='top' width="33%">
+      
+        
+        <ul id="alpha_A" class="alpha">
+          <li class="letter">A</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/AMCHttpStatusCodeException.html" title="Wikidotrb::Common::Exceptions::AMCHttpStatusCodeException (class)">AMCHttpStatusCodeException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Connector/APIKeys.html" title="Wikidotrb::Connector::APIKeys (class)">APIKeys</a></span>
+                
+                  <small>(Wikidotrb::Connector)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/AbstractUser.html" title="Wikidotrb::Module::AbstractUser (class)">AbstractUser</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Connector/AjaxModuleConnectorClient.html" title="Wikidotrb::Connector::AjaxModuleConnectorClient (class)">AjaxModuleConnectorClient</a></span>
+                
+                  <small>(Wikidotrb::Connector)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Connector/AjaxModuleConnectorConfig.html" title="Wikidotrb::Connector::AjaxModuleConnectorConfig (class)">AjaxModuleConnectorConfig</a></span>
+                
+                  <small>(Wikidotrb::Connector)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/AjaxModuleConnectorException.html" title="Wikidotrb::Common::Exceptions::AjaxModuleConnectorException (class)">AjaxModuleConnectorException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Connector/AjaxRequestHeader.html" title="Wikidotrb::Connector::AjaxRequestHeader (class)">AjaxRequestHeader</a></span>
+                
+                  <small>(Wikidotrb::Connector)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/AnonymousUser.html" title="Wikidotrb::Module::AnonymousUser (class)">AnonymousUser</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_C" class="alpha">
+          <li class="letter">C</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Table/CharTable.html" title="Wikidotrb::Table::CharTable (module)">CharTable</a></span>
+                
+                  <small>(Wikidotrb::Table)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/Client.html" title="Wikidotrb::Module::Client (class)">Client</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ClientPrivateMessageMethods.html" title="Wikidotrb::Module::ClientPrivateMessageMethods (class)">ClientPrivateMessageMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ClientSiteMethods.html" title="Wikidotrb::Module::ClientSiteMethods (class)">ClientSiteMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ClientUserMethods.html" title="Wikidotrb::Module::ClientUserMethods (class)">ClientUserMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common.html" title="Wikidotrb::Common (module)">Common</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Connector.html" title="Wikidotrb::Connector (module)">Connector</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_D" class="alpha">
+          <li class="letter">D</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Decorators.html" title="Wikidotrb::Common::Decorators (module)">Decorators</a></span>
+                
+                  <small>(Wikidotrb::Common)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/DeletedUser.html" title="Wikidotrb::Module::DeletedUser (class)">DeletedUser</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_E" class="alpha">
+          <li class="letter">E</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Error.html" title="Wikidotrb::Error (class)">Error</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions.html" title="Wikidotrb::Common::Exceptions (module)">Exceptions</a></span>
+                
+                  <small>(Wikidotrb::Common)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_F" class="alpha">
+          <li class="letter">F</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/ForbiddenException.html" title="Wikidotrb::Common::Exceptions::ForbiddenException (class)">ForbiddenException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/Forum.html" title="Wikidotrb::Module::Forum (class)">Forum</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumCategory.html" title="Wikidotrb::Module::ForumCategory (class)">ForumCategory</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumCategoryCollection.html" title="Wikidotrb::Module::ForumCategoryCollection (class)">ForumCategoryCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumCategoryMethods.html" title="Wikidotrb::Module::ForumCategoryMethods (class)">ForumCategoryMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumGroup.html" title="Wikidotrb::Module::ForumGroup (class)">ForumGroup</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumGroupCollection.html" title="Wikidotrb::Module::ForumGroupCollection (class)">ForumGroupCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumPost.html" title="Wikidotrb::Module::ForumPost (class)">ForumPost</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumPostCollection.html" title="Wikidotrb::Module::ForumPostCollection (class)">ForumPostCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumThread.html" title="Wikidotrb::Module::ForumThread (class)">ForumThread</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumThreadCollection.html" title="Wikidotrb::Module::ForumThreadCollection (class)">ForumThreadCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/ForumThreadMethods.html" title="Wikidotrb::Module::ForumThreadMethods (class)">ForumThreadMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_G" class="alpha">
+          <li class="letter">G</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/GuestUser.html" title="Wikidotrb::Module::GuestUser (class)">GuestUser</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_H" class="alpha">
+          <li class="letter">H</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/HTTPAuthentication.html" title="Wikidotrb::Module::HTTPAuthentication (class)">HTTPAuthentication</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+          </td><td valign='top' width="33%">
+          
+        
+        <ul id="alpha_L" class="alpha">
+          <li class="letter">L</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/LoginRequiredException.html" title="Wikidotrb::Common::Exceptions::LoginRequiredException (class)">LoginRequiredException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_M" class="alpha">
+          <li class="letter">M</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module.html" title="Wikidotrb::Module (module)">Module</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_N" class="alpha">
+          <li class="letter">N</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/NotFoundException.html" title="Wikidotrb::Common::Exceptions::NotFoundException (class)">NotFoundException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_O" class="alpha">
+          <li class="letter">O</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util/Parser/ODateParser.html" title="Wikidotrb::Util::Parser::ODateParser (class)">ODateParser</a></span>
+                
+                  <small>(Wikidotrb::Util::Parser)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_P" class="alpha">
+          <li class="letter">P</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/Page.html" title="Wikidotrb::Module::Page (class)">Page</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageCollection.html" title="Wikidotrb::Module::PageCollection (class)">PageCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageRevision.html" title="Wikidotrb::Module::PageRevision (class)">PageRevision</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageRevisionCollection.html" title="Wikidotrb::Module::PageRevisionCollection (class)">PageRevisionCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageSource.html" title="Wikidotrb::Module::PageSource (class)">PageSource</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageVote.html" title="Wikidotrb::Module::PageVote (class)">PageVote</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PageVoteCollection.html" title="Wikidotrb::Module::PageVoteCollection (class)">PageVoteCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util/Parser.html" title="Wikidotrb::Util::Parser (module)">Parser</a></span>
+                
+                  <small>(Wikidotrb::Util)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PrivateMessage.html" title="Wikidotrb::Module::PrivateMessage (class)">PrivateMessage</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PrivateMessageCollection.html" title="Wikidotrb::Module::PrivateMessageCollection (class)">PrivateMessageCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PrivateMessageInbox.html" title="Wikidotrb::Module::PrivateMessageInbox (class)">PrivateMessageInbox</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/PrivateMessageSentBox.html" title="Wikidotrb::Module::PrivateMessageSentBox (class)">PrivateMessageSentBox</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_Q" class="alpha">
+          <li class="letter">Q</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="QMCPage.html" title="QMCPage (class)">QMCPage</a></span>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="QMCUser.html" title="QMCUser (class)">QMCUser</a></span>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="QuickModule.html" title="QuickModule (class)">QuickModule</a></span>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_R" class="alpha">
+          <li class="letter">R</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util/RequestUtil.html" title="Wikidotrb::Util::RequestUtil (class)">RequestUtil</a></span>
+                
+                  <small>(Wikidotrb::Util)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/ResponseDataException.html" title="Wikidotrb::Common::Exceptions::ResponseDataException (class)">ResponseDataException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_S" class="alpha">
+          <li class="letter">S</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/SearchPagesQuery.html" title="Wikidotrb::Module::SearchPagesQuery (class)">SearchPagesQuery</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/SessionCreateException.html" title="Wikidotrb::Common::Exceptions::SessionCreateException (class)">SessionCreateException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/Site.html" title="Wikidotrb::Module::Site (class)">Site</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/SiteApplication.html" title="Wikidotrb::Module::SiteApplication (class)">SiteApplication</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/SitePageMethods.html" title="Wikidotrb::Module::SitePageMethods (class)">SitePageMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/SitePagesMethods.html" title="Wikidotrb::Module::SitePagesMethods (class)">SitePagesMethods</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util/StringUtil.html" title="Wikidotrb::Util::StringUtil (class)">StringUtil</a></span>
+                
+                  <small>(Wikidotrb::Util)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+          </td><td valign='top' width="33%">
+          
+        
+        <ul id="alpha_T" class="alpha">
+          <li class="letter">T</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Table.html" title="Wikidotrb::Table (module)">Table</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/TargetErrorException.html" title="Wikidotrb::Common::Exceptions::TargetErrorException (class)">TargetErrorException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/TargetExistsException.html" title="Wikidotrb::Common::Exceptions::TargetExistsException (class)">TargetExistsException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_U" class="alpha">
+          <li class="letter">U</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/UnexpectedException.html" title="Wikidotrb::Common::Exceptions::UnexpectedException (class)">UnexpectedException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/User.html" title="Wikidotrb::Module::User (class)">User</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/UserCollection.html" title="Wikidotrb::Module::UserCollection (class)">UserCollection</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util/Parser/UserParser.html" title="Wikidotrb::Util::Parser::UserParser (class)">UserParser</a></span>
+                
+                  <small>(Wikidotrb::Util::Parser)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Util.html" title="Wikidotrb::Util (module)">Util</a></span>
+                
+                  <small>(Wikidotrb)</small>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_W" class="alpha">
+          <li class="letter">W</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/WikidotException.html" title="Wikidotrb::Common::Exceptions::WikidotException (class)">WikidotException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Common/Exceptions/WikidotStatusCodeException.html" title="Wikidotrb::Common::Exceptions::WikidotStatusCodeException (class)">WikidotStatusCodeException</a></span>
+                
+                  <small>(Wikidotrb::Common::Exceptions)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb/Module/WikidotUser.html" title="Wikidotrb::Module::WikidotUser (class)">WikidotUser</a></span>
+                
+                  <small>(Wikidotrb::Module)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="Wikidotrb.html" title="Wikidotrb (module)">Wikidotrb</a></span>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+    </td>
+  </tr>
+</table>
+
+</div>
+
+</div>
 
       <div id="footer">
-  Generated on Tue Mar 18 04:05:40 2025 by
+  Generated on Tue Mar 18 04:11:54 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.2.7).
 </div>
