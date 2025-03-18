@@ -1,0 +1,47 @@
+# Wikidotrb
+
+Ruby library for interacting with Wikidot sites.
+
+## Documentation
+
+- [API Reference](/api/yard/index.html)
+- [Client Guide](/api/client.html)
+
+## Main Classes
+
+- [Wikidotrb](/api/yard/Wikidotrb.html)
+- [Wikidotrb::Module](/api/yard/Wikidotrb/Module.html)
+- [Wikidotrb::Module::Client](/api/yard/Wikidotrb/Module/Client.html)
+- [Wikidotrb::Module::Forum](/api/yard/Wikidotrb/Module/Forum.html)
+- [Wikidotrb::Module::Page](/api/yard/Wikidotrb/Module/Page.html)
+- [Wikidotrb::Module::Site](/api/yard/Wikidotrb/Module/Site.html)
+- [Wikidotrb::Module::User](/api/yard/Wikidotrb/Module/User.html)
+
+## Utility Classes
+
+- [Wikidotrb::Common](/api/yard/Wikidotrb/Common.html)
+- [Wikidotrb::Common::Decorators](/api/yard/Wikidotrb/Common/Decorators.html)
+- [Wikidotrb::Common::Exceptions](/api/yard/Wikidotrb/Common/Exceptions.html)
+- [Wikidotrb::Common::Exceptions::AMCHttpStatusCodeException](/api/yard/Wikidotrb/Common/Exceptions/AMCHttpStatusCodeException.html)
+- [Wikidotrb::Common::Exceptions::AjaxModuleConnectorException](/api/yard/Wikidotrb/Common/Exceptions/AjaxModuleConnectorException.html)
+- [Wikidotrb::Common::Exceptions::ForbiddenException](/api/yard/Wikidotrb/Common/Exceptions/ForbiddenException.html)
+- [Wikidotrb::Common::Exceptions::LoginRequiredException](/api/yard/Wikidotrb/Common/Exceptions/LoginRequiredException.html)
+- [Wikidotrb::Common::Exceptions::NotFoundException](/api/yard/Wikidotrb/Common/Exceptions/NotFoundException.html)
+- [Wikidotrb::Common::Exceptions::ResponseDataException](/api/yard/Wikidotrb/Common/Exceptions/ResponseDataException.html)
+- [Wikidotrb::Common::Exceptions::SessionCreateException](/api/yard/Wikidotrb/Common/Exceptions/SessionCreateException.html)
+- [Wikidotrb::Common::Exceptions::TargetErrorException](/api/yard/Wikidotrb/Common/Exceptions/TargetErrorException.html)
+- [Wikidotrb::Common::Exceptions::TargetExistsException](/api/yard/Wikidotrb/Common/Exceptions/TargetExistsException.html)
+- [Wikidotrb::Common::Exceptions::UnexpectedException](/api/yard/Wikidotrb/Common/Exceptions/UnexpectedException.html)
+- [Wikidotrb::Common::Exceptions::WikidotException](/api/yard/Wikidotrb/Common/Exceptions/WikidotException.html)
+- [Wikidotrb::Common::Exceptions::WikidotStatusCodeException](/api/yard/Wikidotrb/Common/Exceptions/WikidotStatusCodeException.html)
+- [Wikidotrb::Connector](/api/yard/Wikidotrb/Connector.html)
+- [Wikidotrb::Connector::APIKeys](/api/yard/Wikidotrb/Connector/APIKeys.html)
+- [Wikidotrb::Connector::AjaxModuleConnectorClient](/api/yard/Wikidotrb/Connector/AjaxModuleConnectorClient.html)
+- [Wikidotrb::Connector::AjaxModuleConnectorConfig](/api/yard/Wikidotrb/Connector/AjaxModuleConnectorConfig.html)
+- [Wikidotrb::Connector::AjaxRequestHeader](/api/yard/Wikidotrb/Connector/AjaxRequestHeader.html)
+- [Wikidotrb::Util](/api/yard/Wikidotrb/Util.html)
+- [Wikidotrb::Util::Parser](/api/yard/Wikidotrb/Util/Parser.html)
+- [Wikidotrb::Util::Parser::ODateParser](/api/yard/Wikidotrb/Util/Parser/ODateParser.html)
+- [Wikidotrb::Util::Parser::UserParser](/api/yard/Wikidotrb/Util/Parser/UserParser.html)
+- [Wikidotrb::Util::RequestUtil](/api/yard/Wikidotrb/Util/RequestUtil.html)
+- [Wikidotrb::Util::StringUtil](/api/yard/Wikidotrb/Util/StringUtil.html)

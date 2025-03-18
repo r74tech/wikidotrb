@@ -1,0 +1,220 @@
+# Wikidotrb API Documentation
+
+This document provides detailed information about the Wikidotrb API, a Ruby library for interacting with Wikidot sites.
+
+# Wikidotrb
+Source: /api/yard/Wikidotrb.html
+
+No documentation available.
+
+No methods found.
+
+
+# Wikidotrb::Module
+Source: /api/yard/Wikidotrb/Module.html
+
+No documentation available.
+
+No methods found.
+
+
+# Wikidotrb::Module::Client
+Source: /api/yard/Wikidotrb/Module/Client.html
+
+No documentation available.
+
+## Methods
+
+### finalize
+
+Destructor
+
+### initialize
+
+Core client
+
+### login_check
+
+Login check
+
+### to_s
+
+No documentation available.
+
+
+# Wikidotrb::Module::Forum
+Source: /api/yard/Wikidotrb/Module/Forum.html
+
+No documentation available.
+
+## Methods
+
+### categories
+
+Category property
+
+### get_url
+
+Get forum URL
+
+### groups
+
+Group property
+
+### initialize
+
+Initialization method
+
+
+# Wikidotrb::Module::Page
+Source: /api/yard/Wikidotrb/Module/Page.html
+
+No documentation available.
+
+## Methods
+
+### create_or_edit
+
+No documentation available.
+
+### delete_meta
+
+No documentation available.
+
+### destroy
+
+No documentation available.
+
+### discuss
+
+No documentation available.
+
+### discuss=
+
+No documentation available.
+
+### edit
+
+No documentation available.
+
+### get_metas
+
+No documentation available.
+
+### get_url
+
+No documentation available.
+
+### id
+
+No documentation available.
+
+### id=
+
+No documentation available.
+
+### initialize
+
+No documentation available.
+
+### is_discuss_acquired?
+
+No documentation available.
+
+### is_id_acquired?
+
+No documentation available.
+
+### latest_revision
+
+No documentation available.
+
+### revisions
+
+No documentation available.
+
+### revisions=
+
+No documentation available.
+
+### set_meta
+
+No documentation available.
+
+### set_tags
+
+No documentation available.
+
+### source
+
+No documentation available.
+
+### source=
+
+No documentation available.
+
+### votes
+
+No documentation available.
+
+### votes=
+
+No documentation available.
+
+
+# Wikidotrb::Module::Site
+Source: /api/yard/Wikidotrb/Module/Site.html
+
+No documentation available.
+
+## Methods
+
+### amc_request
+
+Execute an AMC request for this site
+
+### from_unix_name
+
+Get a site object by its UNIX name
+
+### get_applications
+
+Get pending membership applications for the site
+
+### get_url
+
+Get the site URL
+
+### initialize
+
+No documentation available.
+
+### invite_user
+
+Invite a user to the site
+
+### login_required
+
+No documentation available.
+
+### to_s
+
+No documentation available.
+
+
+# Wikidotrb::Module::User
+Source: /api/yard/Wikidotrb/Module/User.html
+
+Regular user object
+
+## Methods
+
+### from_name
+
+Get a user object from a username
+
+### initialize
+
+No documentation available.
+
+
